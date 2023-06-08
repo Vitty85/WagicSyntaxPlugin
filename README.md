@@ -20,6 +20,7 @@ The Plugin, by default, will performs inline syntax check on the current row, to
 
 ## Installation
 Donwload the relased zip file containing the WagicSyntaxPlugin.dll and unzip it inside your NotePad++ plugin folder, then restart the editor.
+
 BE AWARE: Currently the release is compiled for 64bit version, to use it on 32bit version you should recoimpile the DLL on the target architecture.
 
 ## Development
