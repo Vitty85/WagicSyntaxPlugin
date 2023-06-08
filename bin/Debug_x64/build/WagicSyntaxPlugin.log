@@ -1,0 +1,35 @@
+﻿  AboutDialog.cpp
+  Hyperlinks.cpp
+  Main.cpp
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(313,29): warning C4244: 'inizializzazione': conversione da 'LRESULT' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(314,25): warning C4244: 'inizializzazione': conversione da 'LRESULT' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(315,31): warning C4244: 'inizializzazione': conversione da 'LRESULT' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(316,29): warning C4244: 'inizializzazione': conversione da 'LRESULT' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(317,31): warning C4244: 'inizializzazione': conversione da 'LRESULT' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(318,29): warning C4244: 'inizializzazione': conversione da 'LRESULT' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(321,39): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(384,73): warning C4267: 'argomento': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(439,40): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(448,20): warning C4267: 'argomento': conversione da 'size_t' a 'const int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(450,77): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(451,58): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(464,20): warning C4267: 'argomento': conversione da 'size_t' a 'const int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(466,77): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(467,62): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(480,20): warning C4267: 'argomento': conversione da 'size_t' a 'const int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(482,77): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(483,66): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(497,20): warning C4267: 'argomento': conversione da 'size_t' a 'const int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(498,77): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(499,61): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(513,73): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(514,57): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(530,73): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(531,55): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(552,67): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(607,82): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+  Generazione del codice in corso...
+     Creazione della libreria C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\bin\Debug_x64\WagicSyntaxPlugin.lib e dell'oggetto C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\bin\Debug_x64\WagicSyntaxPlugin.exp
+  WagicSyntaxPlugin.vcxproj -> C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\bin\Debug_x64\WagicSyntaxPlugin.dll
+  Sottodirectory o file C:\Program Files\Notepad++\plugins\WagicSyntaxPlugin già esistente.
+          1 file copiati.

@@ -82,22 +82,22 @@ static std::vector<std::string> keywords = {
     "geared", "gravecast", "half(all)", "hand(blink)", "hasdead", "hasdefender", "hasexerted", "haunt", "haunted", "head", "hiddenmoveto(", "hmodifer:", "identify", "imprint", "imprintedcard",
     "ingest:", "itself", "kamiflip", "keepname", "kicked!:", "kicker", "kickerrule", "lastturn(", "legendrule", "lessorequalcreatures", "lessorequallands", "lessthan~", "level", "librarybottom", "librarycast",
     "librarysecond", "librarytop", "life:", "lifeleech:", "lifelinkrule", "lifeloss", "lifeset:", "limit:", "limit^", "livingweapon", "lord(", "loseabilities", "loseability", "losesatype(", "losesubtypesof(",
-    "lost", "loyalty", "madness", "madnessplayed", "manacost", "manafaceup", "manapool", "manifest", "max", "maxcast(", "maxlevel:", "maxplay(", "meld(", "meldfrom(", "message(", "miracle", "modbenchant(",
+    "lost", "loyalty", "madnessplayed", "manacost", "manafaceup", "manapool", "manifest", "max", "maxcast(", "maxlevel:", "maxplay(", "meld(", "meldfrom(", "message(", "miracle", "modbenchant(",
     "morbid", "morecardsthanopponent", "morethan~", "morph", "morphrule", "most", "movedto(", "moverandom(", "moveto(", "mutated", "mutateover", "mutateunder", "mutationover:", "mutationunder:", " my ", "myfoe",
     "myname", "myorigname", "myself", "mytgt", "myturnonly", "name(", "named!:", "nameingest", "never", "newability[", "newcolors", "newhook", "newtarget", "next", "nextphase", "ninjutsu", "noevent",
     "nolegend", "nonbasicland", "nonstatic", "noreplace", "normal", "notatarget(", "notblocked", "notdelirum", "notexerted", "notpaid", "notrg", "notrigger", "once", "oneonecounters", "oneshot", "only", " opponent",
     "opponent ", "opponentdamagedbycombat", "opponentpoisoned", "opponentpool", "opponentscontrol", "opponentturnonly", "options(", "out ", "outnumbered", "overload", "overloadrule", "ownerscontrol", "paid(", "paidmana",
     "pay(", "pay[", "payzerorule", "persistrule", "phaseaction", "phaseactionmulti", "phasealter(", "phasedin", "phaseout", "placefromthetop(", "planeswalkerattack", "planeswalkerdamage", "planeswalkerrule", "plus(1)",
-    "plus(2)", "plus(3)", "plus(4)", "plus(5)", "poolsave(", "positive", "power", "powermorethancontrollerhand", "powermorethanopponenthand", "prevent:", "preventallcombatdamage", "preventalldamage", "preventallnoncombatdamage",
+    "plus(2)", "plus(3)", "plus(4)", "plus(5)", "poolsave(", "positive", "powermorethancontrollerhand", "powermorethanopponenthand", "prevent:", "preventallcombatdamage", "preventalldamage", "preventallnoncombatdamage",
     "previous", "producecolor:", "produceextra:", "proliferate", "propagate", "provoke", "prowl(", "pumpboth", "pumppow", "pumptough", "putinplay", "putinplayrule", "raid", "rampage(", "randomcard", "rebound", "reconfigure",
     "reduce(", "reduceto:", "regenerate", "rehook", "reject", "remake(", "removeallcounters(", "removealltypes", "removecreaturesubtypes", "removedfromgame", "removefromcombat", "removemana(", "removemc", "removesinglecountertype(",
     "removetypes", "repeat", "resetdamage", "restricted", "restriction{", "result(", "retarget", "retrace", "retracerule", "return(", "reveal:", "revealend", "revealtype(", "revealuntil(", "revealzone(", "revolt", "sacrifice",
     "scry:", "scryend", "scryzone(", "selectmana", "serumpowder", "setblocker", "sethand:", "setpower=", "settoughness=", "shackle", "shuffle", "sidecast", "single", "skill", "soulbondrule", "source",
     "sourceinplay", "sourcenottap", "sourcetap", "spellmover(", "spent(", "spiritlink", "srccontroller", "srcopponent", "standard", "steal", "surveil", "suspended", "suspendrule", "swap", "tail", "tails",
-    "takeninitiativeof", "taketheinitiative", "tap", "target(", "targetcontroller", "targetopponent", "teach(", "terminate", "text", "thatmuch", "(this", "this(", "thisforeach(", "thisturn(", "time", "to(", "[to]", "token(",
-    "tokencleanuprule", "tokencreated", "tosrc", "total(", "toughness", "trained", "trainer", "transforms(", "trigger", "turn:", "turnlimited", "turns:", "tutorial(", "type:", "type(", "uent", "ueot", "undocpy", "unearthrule",
+    "takeninitiativeof", "taketheinitiative", "tap", "target(", "targetcontroller", "targetopponent", "teach(", "terminate", "text", "thatmuch", "(this", "this(", "thisforeach(", "thisturn(", "time", "toughnesslifegain", "to(", "[to]", "token(",
+    "tokencleanuprule", "tokencreated", "tosrc", "total(", "trained", "trainer", "transforms(", "trigger", "turn:", "turnlimited", "turns:", "tutorial(", "type:", "type(", "uent", "ueot", "undocpy", "unearthrule",
     "untap", "upcost", "upcostmulti", "uynt", "vampired", "vampirerule", "vanishing:", "while(", "winability", "wingame", "with(", "withenchant", "won", "zerodead", "zone(", "if ", "then ", "else ", "activate",
-    "unattach", "choice", "may", "foreach", "aslongas", " beforenextturn", "~morethan~", "~lessthan~", "~equalto~"
+    "unattach", "choice", "may", "foreach", "aslongas", " beforenextturn", "~morethan~", "~lessthan~", "~equalto~", "other "
     // Add any additional Wagic keyword here
 };
 
@@ -203,34 +203,86 @@ static std::vector<std::string> basicabilities = {
     // Add any additional Wagic basic ability here
 };
 
-static bool containsWordInName(const std::string& line, const std::string& word) {
-    std::string openingTag = "name(";
-    std::string closingTag = ")";
-    std::string toCheck = word;
-    if (toCheck[0] == '(')
-        toCheck = toCheck.substr(1, toCheck.length());
-        
-    // Find openingTag pos
-    size_t openingPos = line.find(openingTag);
-    if (openingPos == std::string::npos) {
-        return false;  // openingTag not found
+// List of Wagic card types
+static std::vector<std::string> types = {
+    "abian", "abyss", "advisor", "aetherborn", "ajani", "alara", "ally", "aminatou", "amonkhet", "angel", "angrath", "antausia", "antelope", "ape",
+    "arcane", "arcavios", "archer", "archon", "arkhos", "arlinn", "art", "artifact", "artificer", "ashiok", "assassin", "assembly", "atog", "aura",
+    "aurochs", "autobot", "avatar", "azgol", "azra", "background", "baddest", "badger", "bahamut", "barbarian", "bard", "basic", "basilisk", "basri",
+    "bat", "battle", "bear", "beast", "beaver", "beeble", "beholder", "belenon", "berserker", "biggest", "bird", "blood", "boar", "bolas", "brainiac",
+    "bringer", "brushwagg", "bureaucrat", "calix", "camel", "capenna", "carrier", "cartouche", "cat", "centaur", "cephalid", "chameleon", "chandra",
+    "chicken", "child", "chimera", "citizen", "clamfolk", "class", "cleric", "clue", "cockatrice", "conspiracy", "construct", "contraption", "cow",
+    "coward", "crab", "creature", "cridhe", "crocodile", "curse", "cyborg", "cyclops", "dack", "dakkon", "daretti", "dauthi", "davriel", "deer",
+    "demigod", "demon", "desert", "designer", "devil", "dihada", "dinosaur", "djinn", "dog", "dominaria", "domri", "donkey", "dovin", "dragon",
+    "drake", "dreadnought", "drone", "druid", "dryad", "duck", "dungeon", "dwarf", "eaturecray", "echoir", "efreet", "egg", "elder", "eldraine",
+    "eldrazi", "elemental", "elephant", "elf", "elk", "ellywick", "elminster", "elspeth", "elves", "emblem", "enchant", "enchantment", "equilor",
+    "equipment", "ergamon", "estrid", "etiquette", "eye", "fabacin", "faerie", "ferret", "fiora", "fish", "flagbearer", "food", "forest", "fox",
+    "fractal", "freyalise", "frog", "fungus", "gamer", "gargantikar", "gargoyle", "garruk", "gate", "giant", "gideon", "gith", "gnoll", "gnome",
+    "goat", "gobakhan", "goblin", "god", "golem", "gorgon", "grandchild", "gremlin", "griffin", "grist", "gus", "hag", "halfling", "harpy", "hatificer",
+    "head", "hellion", "hero", "hippo", "hippogriff", "homarid", "homunculus", "horror", "horse", "host", "huatli", "human", "hydra", "hyena",
+    "igpay", "ikoria", "illusion", "imp", "incarnation", "incubator", "insect", "instant", "interrupt", "inzerva", "iquatana", "ir", "island",
+    "ixalan", "jace", "jackal", "jared", "jaya", "jellyfish", "jeska", "juggernaut", "kaladesh", "kaldheim", "kamigawa", "kangaroo", "karn", "karsus",
+    "kasmina", "kavu", "kaya", "kephalai", "killbot", "kinshala", "kiora", "kirin", "kithkin", "knight", "kobold", "kolbahan", "kor", "koth", "kraken",
+    "krav", "kylem", "kyneth", "lady", "lair", "lamia", "lammasu", "land", "lathiel", "leech", "legend", "legendary", "lesson", "leviathan", "lhurgoyf",
+    "licid", "liliana", "lizard", "locus", "lolth", "lord", "lorwyn", "lukka", "luvion", "manticore", "master", "masticore", "meditation", "mercadia",
+    "mercenary", "merfolk", "metathran", "mime", "mine", "minion", "minotaur", "minsc", "mirrodin", "moag", "mole", "monger", "mongoose", "mongseng", "monk",
+    "monkey", "moonfolk", "mordenkainen", "mountain", "mouse", "mummy", "muraganda", "mutant", "myr", "mystic", "naga", "nahiri", "narset", "nastiest",
+    "nautilus", "nephilim", "new", "nightmare", "nightstalker", "niko", "ninja", "nissa", "nixilis", "noble", "noggle", "nomad", "nymph", "octopus",
+    "ogre", "oko", "ongoing", "ooze", "orc", "orgg", "otter", "ouphe", "ox", "oyster", "pangolin", "paratrooper", "peasant", "pegasus", "penguin",
+    "pest", "phelddagrif", "phenomenon", "phoenix", "phyrexia", "phyrexian", "pilot", "pirate", "plains", "plane", "planeswalker", "plant", "player",
+    "power", "powerstone", "praetor", "processor", "proper", "pyrulea", "rabbit", "rabiah", "raccoon", "ral", "ranger", "rat", "rath", "ravnica", "realm",
+    "rebel", "reflection", "regatha", "rhino", "rigger", "rogue", "rowan", "rune", "sable", "saga", "saheeli", "salamander", "samurai", "samut", "saproling",
+    "sarkhan", "satyr", "scarecrow", "scheme", "scientist", "scorpion", "scout", "segovia", "serpent", "serra", "shade", "shaman", "shandalar", "shapeshifter",
+    "shark", "sheep", "shenmeng", "ship", "shrine", "siege", "siren", "skeleton", "slith", "sliver", "slug", "snake", "snow", "soldier", "soltari", "sorcery",
+    "sorin", "spawn", "specter", "spellshaper", "sphere", "sphinx", "spider", "spike", "spirit", "sponge", "spy", "squid", "squirrel", "starfish", "summon",
+    "surrakar", "survivor", "swamp", "szat", "tamiyo", "tarkir", "tasha", "teferi", "tentacle", "tetravite", "teyo", "tezzeret", "thalakos", "theros", "thopter",
+    "thrull", "tibalt", "tiefling", "tower", "townsfolk", "trap", "treasure", "treefolk", "tribal", "trilobite", "triskelavite", "troll", "turtle", "tyvar",
+    "ugin", "ulgrotha", "unicorn", "urza", "valla", "vanguard", "vampire", "vampyre", "vedalken", "vehicle", "venser", "viashino", "villain", "vivien", "volver",
+    "vraska", "vryn", "waiter", "wall", "walrus", "warlock", "warrior", "weird", "werewolf", "whale", "wildfire", "will", "windgrace", "wizard", "wolf",
+    "wolverine", "wombat", "worker", "world", "worm", "wraith", "wrenn", "wrestler", "wurm", "xenagos", "xerex", "yanggu", "yanling", "yeti", "zariel",
+    "zendikar", "zhalfir", "zombie", "zubera", "creature", "instant"
+    // Add any additional Wagic types here
+};
+
+static bool containsWordBetween(const std::string openingTag, const std::string closingTag, const std::string& line, const std::string& word, const int pos) {
+    std::string wordToCheck = word;
+    std::string lineToCheck = line;
+    wordToCheck.erase(wordToCheck.find_last_not_of(" \n\r\t") + 1);
+    if (wordToCheck[0] == '(' || wordToCheck[0] == '[' || wordToCheck[0] == '{' || wordToCheck[0] == ':' ||
+        wordToCheck[0] == '~' || wordToCheck[0] == ' ' || wordToCheck[0] == '!' || wordToCheck[0] == '$')
+        wordToCheck = wordToCheck.substr(1, wordToCheck.length());
+    
+    size_t openingPos = 0;
+    size_t delta = 0;
+    while (openingPos != std::string::npos)
+    {
+        // Find openingTag pos
+        openingPos = lineToCheck.find(openingTag);
+        if (openingPos == std::string::npos) {
+            return false;  // openingTag not found
+        }
+
+        // Find closingTag pos after openingTag
+        size_t closingPos = lineToCheck.find(closingTag, openingPos + openingTag.length()) + 1;
+        if (closingPos == std::string::npos) {
+            return false;  // closingTag not found
+        }
+
+        // Get the substring between openingTag and closingTag
+        std::string nameValue = lineToCheck.substr(openingPos + openingTag.length(), closingPos - openingPos - openingTag.length());
+
+        // Trim the spaces
+        nameValue.erase(std::remove_if(nameValue.begin(), nameValue.end(), ::isspace), nameValue.end());
+
+        // Find the word in the substring
+        size_t wordPos = nameValue.find(wordToCheck);
+        if (wordPos != std::string::npos && pos < (closingPos + delta))
+            return true;
+
+        // Try to seek row to search on next iteration
+        delta += openingPos + openingTag.length() + 1;
+        lineToCheck = lineToCheck.substr(openingPos + openingTag.length() + 1, lineToCheck.length());
     }
-
-    // Find closingTag pos after openingTag
-    size_t closingPos = line.find(closingTag, openingPos + openingTag.length()) + 1;
-    if (closingPos == std::string::npos) {
-        return false;  // closingTag not found
-    }
-
-    // Get the substring between openingTag and closingTag
-    std::string nameValue = line.substr(openingPos + openingTag.length(), closingPos - openingPos - openingTag.length());
-
-    // Trim the spaces
-    nameValue.erase(std::remove_if(nameValue.begin(), nameValue.end(), ::isspace), nameValue.end());
-
-    // Find the word in the substring
-    size_t wordPos = nameValue.find(toCheck);
-    return (wordPos != std::string::npos);
+    return false;
 }
 
 static void SetStyles() {
@@ -246,7 +298,7 @@ static void SetStyles() {
     ::SendMessage(nppData._scintillaMainHandle, SCI_STYLESETFORE, SCE_C_TASKMARKER, RGB(140, 0, 0)); // Bordeaux style for triggers
     ::SendMessage(nppData._scintillaMainHandle, SCI_STYLESETFORE, SCE_C_COMMENTDOC, RGB(220, 100, 200)); // Purple style for zones
     ::SendMessage(nppData._scintillaMainHandle, SCI_STYLESETFORE, SCE_C_HASHQUOTEDSTRING, RGB(255, 165, 0)); // Orange style for macros
-    ::SendMessage(nppData._scintillaMainHandle, SCI_STYLESETFORE, SCE_C_PREPROCESSOR, RGB(100, 100, 100)); // Gray style for macros
+    ::SendMessage(nppData._scintillaMainHandle, SCI_STYLESETFORE, SCE_C_PREPROCESSOR, RGB(120, 120, 120)); // Gray style for macros
     ::SendMessage(nppData._scintillaMainHandle, SCI_STYLESETFORE, SCE_C_OPERATOR, RGB(0, 0, 0)); // Black style for operators
 
     // Set the style for mismatched parentheses
@@ -285,6 +337,11 @@ static LRESULT handleScnModified(SCNotification* notification) {
 
             std::vector<std::string> matchingSuggestions;
 
+            for (const std::string& suggestion : types) {
+                if (suggestion.compare(0, currentWord.length(), currentWord) == 0) {
+                    matchingSuggestions.push_back(suggestion);
+                }
+            }
             for (const std::string& suggestion : keywords) {
                 if (suggestion.compare(0, currentWord.length(), currentWord) == 0) {
                     matchingSuggestions.push_back(suggestion);
@@ -365,14 +422,19 @@ static void CheckWagicLineSyntax(int i) {
     std::string lineText = editor.GetLine(i);
     std::transform(lineText.begin(), lineText.end(), lineText.begin(),
         [](unsigned char c) { return std::tolower(c); });
-    if (lineText.find("text=") != 0 && lineText.find("name=") != 0 && lineText.find("power=") != 0 && lineText.find("toughness=") != 0 &&
-        lineText.find("type=") != 0 && lineText.find("subtype=") != 0 && lineText.find("grade=") != 0) {
-        // Check if it's a comment row
-        if (lineText[0] == '#') {
-            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, editor.PositionFromLine(i), 0x1f);
-            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, editor.GetLineEndPosition(i), SCE_C_COMMENT);
-            return;
-        }
+
+    // Check if it's a comment row
+    if (lineText[0] == '#') {
+        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, editor.PositionFromLine(i), 0x1f);
+        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, editor.GetLineEndPosition(i) - editor.PositionFromLine(i), SCE_C_COMMENT);
+        return;
+    }
+    if (lineText[0] == '[' || !(lineText.find("text=") != 0 && lineText.find("name=") != 0 && lineText.find("power=") != 0 && lineText.find("toughness=") != 0 &&
+        lineText.find("type=") != 0 && lineText.find("subtype=") != 0 && lineText.find("grade=") != 0)) {
+        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, editor.PositionFromLine(i), 0x1f);
+        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, editor.GetLineEndPosition(i) - editor.PositionFromLine(i), SCE_C_OPERATOR);
+        return;
+    } else {
         // Remove the row prefix
         int offset = lineText.find("=");
         if (offset < 0)
@@ -383,7 +445,7 @@ static void CheckWagicLineSyntax(int i) {
         for (const std::string& zone : zones) {
             size_t pos = 0;
             while ((pos = lineText.find(zone, pos)) != std::string::npos) {
-                if (!containsWordInName(lineText, zone)) {
+                if (!containsWordBetween("name(", ")", lineText, zone, pos)) {
                     // Apply the choosen color
                     int startPos = editor.PositionFromLine(i) + pos + offset;
                     int endPos = startPos + zone.length();
@@ -399,7 +461,7 @@ static void CheckWagicLineSyntax(int i) {
         for (const std::string& constant : constants) {
             size_t pos = 0;
             while ((pos = lineText.find(constant, pos)) != std::string::npos) {
-                if (!containsWordInName(lineText, constant)) {
+                if (!containsWordBetween("name(", ")", lineText, constant, pos)) {
                     // Apply the choosen color
                     int startPos = editor.PositionFromLine(i) + pos + offset;
                     int endPos = startPos + constant.length();
@@ -415,7 +477,7 @@ static void CheckWagicLineSyntax(int i) {
         for (const std::string& basicability : basicabilities) {
             size_t pos = 0;
             while ((pos = lineText.find(basicability, pos)) != std::string::npos) {
-                if (!containsWordInName(lineText, basicability)) {
+                if (!containsWordBetween("name(", ")", lineText, basicability, pos)) {
                     // Apply the choosen color
                     int startPos = editor.PositionFromLine(i) + pos + offset;
                     int endPos = startPos + basicability.length();
@@ -432,7 +494,7 @@ static void CheckWagicLineSyntax(int i) {
             size_t pos = 0;
             while ((pos = lineText.find(keyword, pos)) != std::string::npos) {
                 // Apply the choosen color
-                if (!containsWordInName(lineText, keyword)) {
+                if (!containsWordBetween("name(", ")", lineText, keyword, pos)) {
                     int startPos = editor.PositionFromLine(i) + pos + offset;
                     int endPos = startPos + keyword.length();
                     if (endPos > editor.GetLineEndPosition(i))
@@ -612,7 +674,7 @@ static void SetCurrentEditor() {
 }
 
 LRESULT CALLBACK PluginWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-    if (message == WM_HOTKEY) {
+    if (message == WM_HOTKEY && active) {
         SCNotification* notification = new SCNotification();
         notification->modificationType = SC_MOD_INSERTTEXT;
         handleScnModified(notification);
@@ -633,7 +695,8 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification * notifyCode) {
     case SCN_UPDATEUI:
     case NPPN_FILEOPENED:
     case NPPN_READY:
-        CheckWagicCurrentLineSyntax();
+        if(active)
+            CheckWagicCurrentLineSyntax();
         break;
     case SCN_MODIFIED:
         if(active)
