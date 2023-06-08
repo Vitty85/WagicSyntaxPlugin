@@ -67,24 +67,24 @@ static FuncItem menuItems[] = {
 static std::vector<std::string> keywords = {
     "(any)", "(blink)", "(blink)forsrc", "(blink)ueot", "(duplicateall)", "(halfall)", ",notrigger","ability$", "ability$!", "abilitycontroller", "absorb", "add{", "addtype(",
     "affinity(", "after<", " age ", "all(", "allsubtypes", "altercost(", "alterdevoffset:", "alterenergy:", "alterexperience:", "altermutationcounter:", "alternative", "alternativecostrule",
-    "alterpoison:", "altersurvoffset:", "alteryidarocount:", "and!(", "any", "aslongas(", "assorcery", "attackcost:", "attackcostrule", "attackedalone", "attacking",
+    "alterpoison:", "altersurvoffset:", "alteryidarocount:", "and!(", "any}", "aslongas(", "assorcery", "attackcost:", "attackcostrule", "attackedalone",
     "attackpwcost:", "attackrule", "aura", "backside", "battleready", "becomes(", "becomesmonarch", "becomesmonarchfoeof", "becomesmonarchof", "belong", "bestow",
-    "bestowrule", "blockcost:", "blockcostrule", "blocked", "blocking", "blockrule", "bloodthirst:", "boasted", "bonusrule", "bottomoflibrary", "bstw", "bury", "bushido(",
+    "bestowrule", "blockcost:", "blockcostrule", "blockrule", "bloodthirst:", "boasted", "bonusrule", "bottomoflibrary", "bstw", "bury", "bushido(",
     "buyback", "buybackrule", "cantargetcard(", "cantbeblockedby(", "cantbeblockerof(", "cantbetargetof(", "canuntap", "card(", "cards(", "cascade:", "castcard(", "castcard(restricted",
-    "casted(", "cdaactive", "chain.wav", "changecost(", "charge", "checkex", "chooseaname", "chosencolor", "chosenname", "chosentype", "clone", "coinflipped", "color", "coloringest",
-    "colorless", "colors", "combatspiritlink", "combattriggerrule", "commandzonecast", "compare(", "completedungeon:", "conjure", "connect", "connectrule", "continue",
+    "casted(", "cdaactive", "chain.wav", "changecost(", "charge", "checkex", "chooseaname", "clone", "coinflipped", "coloringest",
+    "colors", "combatspiritlink", "combattriggerrule", "commandzonecast", "compare(", "completedungeon:", "conjure", "connect", "connectrule", "continue",
     "controller", "copied", "copiedacard", "copy", "costx!:", "count(", "countb(", "counter(", "counteradded(", "countermod(", "counterremoved(", "countershroud(", "countersoneone",
     "countertrack(", "coven", "create(", "cumulativeupcost", "cycled", "damage:", "deadcreart", "deadpermanent", "deathtouchrule", "defense", "delayed", "delirium", "deplete:",
     "destroy", "didattack", "didblock", "didnotcastnontoken", "didntattack", "discard:", "discardbyopponent", "doboast", "doesntempty", "doforetell", "donothing", "dontremove", "dontshow",
     "dotrain", "doubleside(", "draw:", "dredgerule", "duplicate(all)", "duplicatecounters(", "dynamicability", "eachother", "epic", "equalto~", "equip", "equipment", "equipped", "evicttypes",
     "evolve", "except", "exchangelife", "exert", "exilecast", "exileimp", "exploits", "explores", "facedown", "facedup", "faceup", "fade", "fading:", "fizzle ", "fizzle!", "?fizzle]", "fizzleto(", "flanker", "flanking",
-    "flashbackrule", "flip(", "flipped", "foelost(", "fog", "forceclean", "forcedalive", "forcefield", "forcetype(", "foreach(", "foretold", "forever", "freeze", "from", "from(", "fromplay", "frozen",
-    "geared", "gravecast", "half(all)", "hand(blink)", "hasdead", "hasdefender", "hasexerted", "haunt", "haunted", "head", "hiddenmoveto(", "hmodifer:", "identify", "imprint", "imprintedcard",
+    "flashbackrule", "flip(", "flipped", "foelost(", "fog", "forceclean", "forcedalive", "forcefield", "forcetype(", "foreach(", "forever", "freeze", "from", "from(", "fromplay", "frozen",
+    "gravecast", "half(all)", "hand(blink)", "hasdead", "hasdefender", "hasexerted", "haunt", "haunted", "head", "hiddenmoveto(", "hmodifer:", "identify", "imprint", "imprintedcard",
     "ingest:", "itself", "kamiflip", "keepname", "kicked!:", "kicker", "kickerrule", "lastturn(", "legendrule", "lessorequalcreatures", "lessorequallands", "lessthan~", "level", "librarybottom", "librarycast",
     "librarysecond", "librarytop", "life:", "lifeleech:", "lifelinkrule", "lifeloss", "lifeset:", "limit:", "limit^", "livingweapon", "lord(", "loseabilities", "loseability", "losesatype(", "losesubtypesof(",
-    "lost", "loyalty", "madnessplayed", "manacost", "manafaceup", "manapool", "manifest", "max", "maxcast(", "maxlevel:", "maxplay(", "meld(", "meldfrom(", "message(", "miracle", "modbenchant(",
+    "lost", "loyalty", "madnessplayed", "manafaceup", "manapool", "manifest", "max", "maxcast(", "maxlevel:", "maxplay(", "meld(", "meldfrom(", "message(", "miracle", "modbenchant(",
     "morbid", "morecardsthanopponent", "morethan~", "morph", "morphrule", "most", "movedto(", "moverandom(", "moveto(", "mutated", "mutateover", "mutateunder", "mutationover:", "mutationunder:", " my ", "myfoe",
-    "myname", "myorigname", "myself", "mytgt", "myturnonly", "name(", "named!:", "nameingest", "never", "newability[", "newcolors", "newhook", "newtarget", "next", "nextphase", "ninjutsu", "noevent",
+    "myname", "myorigname", "myself", "myturnonly", "name(", "named!:", "nameingest", "never", "newability[", "newcolors", "newhook", "newtarget", "next", "nextphase", "ninjutsu", "noevent",
     "nolegend", "nonbasicland", "nonstatic", "noreplace", "normal", "notatarget(", "notblocked", "notdelirum", "notexerted", "notpaid", "notrg", "notrigger", "once", "oneonecounters", "oneshot", "only", " opponent",
     "opponent ", "opponentdamagedbycombat", "opponentpoisoned", "opponentpool", "opponentscontrol", "opponentturnonly", "options(", "out ", "outnumbered", "overload", "overloadrule", "ownerscontrol", "paid(", "paidmana",
     "pay(", "pay[", "payzerorule", "persistrule", "phaseaction", "phaseactionmulti", "phasealter(", "phasedin", "phaseout", "placefromthetop(", "planeswalkerattack", "planeswalkerdamage", "planeswalkerrule", "plus(1)",
@@ -155,7 +155,7 @@ static std::vector<std::string> macros = {
 // List of Wagic constants
 static std::vector<std::string> constants = {
     "abundantlife", "allbattlefieldcardtypes", "allgravecardtypes", "allmyname", "anycnt", "auras", "azorius", "boros", "bothalldead", "bushidopoints", "calculateparty", "canforetellcast",
-    "cantargetcre", "cantargetmycre", "cantargetoppocre", "cardcountabil", "cardcounttype", "castx", "chosencolor", "chosentype", "commonblack", "commonblue", "commongreen", "commonred", "commonwhite",
+    "cantargetcre", "cantargetmycre", "cantargetoppocre", "cardcountabil", "cardcounttype", "castx", "chosencolor", "chosenname", "chosentype", "commonblack", "commonblue", "commongreen", "commonred", "commonwhite",
     "controllerturn", "converge", "convertedcost:", "countallspell", "countedamount", "countedbamount", "counter{", "countmycrespell", "countmynoncrespell", "crewtotalpower", "currentphase", "currentturn",
     "cursedscrollresult", "diffcardcountabil", "diffcardcounttype", "dimir", "direction", "dualfaced", "epicactivated", "evictb", "evictg", "evictmc", "evictpw", "evictr", "evictth", "evictu",
     "evictw", "excessdamage", "findfirsttype", "findlasttype", "fivetimes", "fourtimes", "fullpaid", "gear", "genrand", "golgari", "gruul", "halfdown", "halfpaid", "halfup", "handsize", "hasability", "hascnt",
@@ -174,7 +174,11 @@ static std::vector<std::string> constants = {
     "pwrtotatt", "pwrtotblo", "pyidarocount", "rakdos", "restriction{", "revealedmana", "revealedp", "revealedt", "sametypecreatures", "scryedcards", "selesnya", "simic", "snowdiffmana", "srclastdiefaces", "srclastrollchoice",
     "srclastrollresult", "startinglife", "startingplayer", "stored", "sunburst", "targetedcurses", "thatmuch", "thirddown", "thirdpaid", "thirdup", "thrice", "ths:", "thstotalinplay", "thstotatt", "thstotblo", "totalcololorsinplay",
     "totaldmg", "totalmana", "totcnt", "totcntall", "totcntart", "totcntbat", "totcntcre", "totcntenc", "totcntlan", "totcntpla", "totmanaspent", "toughness", "toughnesstotalinplay", "treefolk", "twice", "urzatron", "usedmana",
-    "withpartner", "worshipped", "colorless", "green", "blue", "red", "black", "white", "waste", "alternative", "buyback", "flashback", "retrace", "kicker", "facedown", "bestow"
+    "withpartner", "worshipped", "colorless", "green", "blue", "red", "black", "white", "waste", "alternative", "buyback", "flashback", "retrace", "kicker", "facedown", "bestow","anyamount","attacking", "backname", " blockable ", 
+    "blocked", "blocking", "c_black", "c_blue", "c_extra", "c_green", "c_red", "c_white", "cantarget ", "cardid", "children", "cmana", "color ", "controllerdamager", "damaged", "damager", "description", "discarded", "dredgeable", 
+    "enchanted", "equals", "equipped", "evictname", "exerted", "expansion", "extracostshadow", "foretold", "geared", "hasbackside", "hasconvoke", "hasflashback", "haskicker", "haspartner", "hasx", "icon", "lastnamechosen", 
+    "leveler", "manab", "manacost", "manag", "manar", "manau", "manaw", "mtgid", "multicolor", "mychild", "mycurses", "myeqp", "mysource", "mytgt", "mytotem", "notshare!", "numofcols", "opponentdamager", "pairable", "parents", 
+    "partname", "preyname", "proliferation", "rarity", "recent", "shadow", "share!", "sourcecard", "storedname", "tapped", "targetedplayer", "targetter", "title", "unknown", "upto:", "zpos", "notany}"
     // Add any additional Wagic constant here
 };
 
