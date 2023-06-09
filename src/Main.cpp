@@ -64,7 +64,7 @@ static FuncItem menuItems[] = {
 };
 
 // List of Wagic keywords
-static std::vector<std::string> keywords = {
+std::vector<std::string> keywords = {
     "(any)", "(blink)", "(blink)forsrc", "(blink)ueot", "(duplicateall)", "(halfall)", ",notrigger","ability$", "ability$!", "abilitycontroller", "absorb", "add{", "addtype(",
     "affinity(", "after<", " age ", "all(", "allsubtypes", "altercost(", "alterdevoffset:", "alterenergy:", "alterexperience:", "altermutationcounter:", "alternative", "alternativecostrule",
     "alterpoison:", "altersurvoffset:", "alteryidarocount:", "and!(", "any}", "aslongas(", "assorcery", "attackcost:", "attackcostrule", "attackedalone",
@@ -84,7 +84,7 @@ static std::vector<std::string> keywords = {
     "librarysecond", "librarytop", "life:", "lifeleech:", "lifelinkrule", "lifeloss", "lifeset:", "limit:", "limit^", "livingweapon", "lord(", "loseabilities", "loseability", "losesatype(", "losesubtypesof(",
     "lost", "loyalty", "madnessplayed", "manafaceup", "manapool", "manifest", "max", "maxcast(", "maxlevel:", "maxplay(", "meld(", "meldfrom(", "message(", "miracle", "modbenchant(",
     "morbid", "morecardsthanopponent", "morethan~", "morph", "morphrule", "most", "movedto(", "moverandom(", "moveto(", "mutated", "mutateover", "mutateunder", "mutationover:", "mutationunder:", " my ", "myfoe",
-    "myname", "myorigname", "myself", "myturnonly", "name(", "named!:", "nameingest", "never", "newability[", "newcolors", "newhook", "newtarget", "next", "nextphase", "ninjutsu", "noevent",
+    "myname", "myorigname", "myself", "myturnonly", "name", "named!:", "nameingest", "never", "newability[", "newcolors", "newhook", "newtarget", "next", "nextphase", "ninjutsu", "noevent",
     "nolegend", "nonbasicland", "nonstatic", "noreplace", "normal", "notatarget(", "notblocked", "notdelirum", "notexerted", "notpaid", "notrg", "notrigger", "once", "oneonecounters", "oneshot", "only", " opponent",
     "opponent ", "opponentdamagedbycombat", "opponentpoisoned", "opponentpool", "opponentscontrol", "opponentturnonly", "options(", "out ", "outnumbered", "overload", "overloadrule", "ownerscontrol", "paid(", "paidmana",
     "pay(", "pay[", "payzerorule", "persistrule", "phaseaction", "phaseactionmulti", "phasealter(", "phasedin", "phaseout", "placefromthetop(", "planeswalkerattack", "planeswalkerdamage", "planeswalkerrule", "plus(1)",
@@ -102,7 +102,7 @@ static std::vector<std::string> keywords = {
 };
 
 // List of Wagic zones
-static std::vector<std::string> zones = {
+std::vector<std::string> zones = {
     "mycastingzone", "myrestrictedcastingzone", "mycommandplay", "myhandlibrary", "mygravelibrary", "opponentgravelibrary", "mygraveexile",
     "opponentgraveexile", "opponentcastingzone", "opponentrestrictedcastingzone", "opponentcommandplay", "opponenthandlibrary",
     "mynonplaynonexile", "opponentnonplaynonexile", "myhandexilegrave", "opponenthandexilegrave", "myzones", "opponentzones",
@@ -115,7 +115,7 @@ static std::vector<std::string> zones = {
 };
 
 // List of Wagic triggers
-static std::vector<std::string> triggers = {
+std::vector<std::string> triggers = {
     "@tappedformana", "@becomesmonarchof", "@drawof", "@combat", "@boasted", "@targeted", "@lifelostfoeof",
     "@noncombatdamagefoeof", "@takeninitiativeof", "@energizedof", "@counteradded", "@totalcounteradded",
     "@scryed", "@producedmana", "@becomesmonarchfoeof", "@dierolled", "@damageof", "@sacrificed", "@combatdamaged",
@@ -137,7 +137,7 @@ static std::vector<std::string> triggers = {
 };
 
 // List of Wagic macros
-static std::vector<std::string> macros = {
+std::vector<std::string> macros = {
     "__CYCLING__", "__BASIC_LANDCYCLING__", "_DIES_", "_TRAINING_", "_PARTNER_", "_GOAD_", "_REBOUND_", "_POPULATE_", "_FEROCIOUS_",
     "_ATTACKING_", "_BLOCKED_", "_HEROIC_", "_RALLY_", "_LANDFALL_", "_ADDENDUM_", "_CONSTELLATION_", "_AMASS_", "_SCRY_", "_SCRY1_",
     "_SCRY2_", "_SCRY3_", "_SCRY4_", "_SCRY5_", "_FABRICATE_", "_ENRAGE_", "_SECOND_DRAW_", "_ADAPT_", "_BATTALION_", "_CHAMPION_",
@@ -153,7 +153,7 @@ static std::vector<std::string> macros = {
 };
 
 // List of Wagic constants
-static std::vector<std::string> constants = {
+std::vector<std::string> constants = {
     "abundantlife", "allbattlefieldcardtypes", "allgravecardtypes", "allmyname", "anycnt", "auras", "azorius", "boros", "bothalldead", "bushidopoints", "calculateparty", "canforetellcast",
     "cantargetcre", "cantargetmycre", "cantargetoppocre", "cardcountabil", "cardcounttype", "castx", "chosencolor", "chosenname", "chosentype", "commonblack", "commonblue", "commongreen", "commonred", "commonwhite",
     "controllerturn", "converge", "convertedcost:", "countallspell", "countedamount", "countedbamount", "counter{", "countmycrespell", "countmynoncrespell", "crewtotalpower", "currentphase", "currentturn",
@@ -183,7 +183,7 @@ static std::vector<std::string> constants = {
 };
 
 // List of Wagic basic abilities
-static std::vector<std::string> basicabilities = {
+std::vector<std::string> basicabilities = {
     "trample", "forestwalk", "islandwalk", "mountainwalk", "swampwalk", "plainswalk", "flying", "first strike", "double strike", "fear", "flash", "haste", "lifelink",
     "reach", "shroud", "vigilance", "defender", "banding", "protection from green", "protection from blue", "protection from red", "protection from black", "protection from white",
     "unblockable", "wither", "persist", "retrace", "exalted", "nofizzle", "shadow", "reachshadow", "foresthome", "islandhome", "mountainhome", "swamphome", "plainshome",
@@ -208,7 +208,7 @@ static std::vector<std::string> basicabilities = {
 };
 
 // List of Wagic card types
-static std::vector<std::string> types = {
+std::vector<std::string> types = {
     "abian", "abyss", "advisor", "aetherborn", "ajani", "alara", "ally", "aminatou", "amonkhet", "angel", "angrath", "antausia", "antelope", "ape",
     "arcane", "arcavios", "archer", "archon", "arkhos", "arlinn", "art", "artifact", "artificer", "ashiok", "assassin", "assembly", "atog", "aura",
     "aurochs", "autobot", "avatar", "azgol", "azra", "background", "baddest", "badger", "bahamut", "barbarian", "bard", "basic", "basilisk", "basri",
@@ -246,6 +246,8 @@ static std::vector<std::string> types = {
     "zendikar", "zhalfir", "zombie", "zubera", "creature", "instant"
     // Add any additional Wagic types here
 };
+
+std::vector<std::string> allVectors;
 
 static bool containsWordBetween(const std::string openingTag, const std::string closingTag, const std::string& line, const std::string& word, const int pos) {
     std::string wordToCheck = word;
@@ -331,7 +333,20 @@ static LRESULT handleScnModified(SCNotification* notification) {
 
         if (wordStartPosition != wordEndPosition) {
             std::string currentWord = editor.GetText().substr(wordStartPosition, wordEndPosition);
+            currentWord = currentWord.substr(0, currentWord.find_first_of('\r'));
             currentWord = currentWord.substr(0, currentWord.find_first_of('\n'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('\t'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of(' '));
+            currentWord = currentWord.substr(0, currentWord.find_first_of(')'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('('));
+            currentWord = currentWord.substr(0, currentWord.find_first_of(']'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of(']'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('{'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('}'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('$'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('$'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('!'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('!'));
             if (editor.GetText().substr(wordStartPosition - 1, 1) == "@" || editor.GetText().substr(wordStartPosition - 1, 1) == "_" ||
                 editor.GetText().substr(wordStartPosition - 1, 1) == "~")
                 currentWord = editor.GetText().substr(wordStartPosition - 1, 1) + currentWord;
@@ -341,41 +356,18 @@ static LRESULT handleScnModified(SCNotification* notification) {
 
             std::vector<std::string> matchingSuggestions;
 
+            for (const std::string& suggestion : allVectors) {
+                if (suggestion.compare(0, currentWord.length(), currentWord) == 0) {
+                    matchingSuggestions.push_back(suggestion);
+                }
+            }
+
             for (const std::string& suggestion : types) {
                 if (suggestion.compare(0, currentWord.length(), currentWord) == 0) {
                     matchingSuggestions.push_back(suggestion);
                 }
             }
-            for (const std::string& suggestion : keywords) {
-                if (suggestion.compare(0, currentWord.length(), currentWord) == 0) {
-                    matchingSuggestions.push_back(suggestion);
-                }
-            }
-            for (const std::string& suggestion : macros) {
-                if (suggestion.compare(0, currentWord.length(), currentWord) == 0) {
-                    matchingSuggestions.push_back(suggestion);
-                }
-            }
-            for (const std::string& suggestion : zones) {
-                if (suggestion.compare(0, currentWord.length(), currentWord) == 0) {
-                    matchingSuggestions.push_back(suggestion);
-                }
-            }
-            for (const std::string& suggestion : constants) {
-                if (suggestion.compare(0, currentWord.length(), currentWord) == 0) {
-                    matchingSuggestions.push_back(suggestion);
-                }
-            }
-            for (const std::string& suggestion : basicabilities) {
-                if (suggestion.compare(0, currentWord.length(), currentWord) == 0) {
-                    matchingSuggestions.push_back(suggestion);
-                }
-            }
-            for (const std::string& suggestion : triggers) {
-                if (suggestion.compare(0, currentWord.length(), currentWord) == 0) {
-                    matchingSuggestions.push_back(suggestion);
-                }
-            }
+
             if (!matchingSuggestions.empty()) {
                 // Merge all the suggetsions in a unique string with '\n' sperator
                 std::string suggestionsString;
@@ -389,6 +381,7 @@ static LRESULT handleScnModified(SCNotification* notification) {
                 editor.AutoCSetSeparator('\n');
                 editor.AutoCSetAutoHide(true);
             }
+
             SetStyles();
             CheckWagicLineSyntax(currentLine);
             return 0;
@@ -445,100 +438,56 @@ static void CheckWagicLineSyntax(int i) {
             return;
         lineText = lineText.substr(offset);
 
-        // Find the zones in the row
-        for (const std::string& zone : zones) {
+        // Find the all the possibile tokens in the current row
+        for (const std::string& elem : allVectors) {
             size_t pos = 0;
-            while ((pos = lineText.find(zone, pos)) != std::string::npos) {
-                if (!containsWordBetween("name(", ")", lineText, zone, pos)) {
-                    // Apply the choosen color
+            std::string word = elem;
+            std::transform(word.begin(), word.end(), word.begin(),
+                [](unsigned char c) { return std::tolower(c); });
+            while ((pos = lineText.find(word, pos)) != std::string::npos) {
+                if (!containsWordBetween("name(", ")", lineText, word, pos)) {
                     int startPos = editor.PositionFromLine(i) + pos + offset;
-                    int endPos = startPos + zone.length();
+                    int endPos = startPos + word.length();
                     if (endPos > editor.GetLineEndPosition(i))
                         endPos = editor.GetLineEndPosition(i);
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_COMMENTDOC);
+                    // Apply the correct color
+                    if (std::find(zones.begin(), zones.end(), word) != zones.end())
+                    {
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_COMMENTDOC);
+                    } 
+                    else if (std::find(constants.begin(), constants.end(), word) != constants.end())
+                    {
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_PREPROCESSOR);
+                    }
+                    else if (std::find(basicabilities.begin(), basicabilities.end(), word) != basicabilities.end())
+                    {
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_PREPROCESSOR);
+                    }
+                    else if (std::find(keywords.begin(), keywords.end(), word) != keywords.end())
+                    {
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_WORD);
+                    }
+                    else if (std::find(triggers.begin(), triggers.end(), word) != triggers.end())
+                    {
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_TASKMARKER);
+                    }
+                    else
+                    {
+                        std::transform(word.begin(), word.end(), word.begin(),
+                            [](unsigned char c) { return std::toupper(c); });
+                        if (std::find(macros.begin(), macros.end(), word) != macros.end())
+                        {
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_HASHQUOTEDSTRING);
+                        }
+                    }
                 }
-                pos += zone.length();
-            }
-        }
-        // Find the constants in the row
-        for (const std::string& constant : constants) {
-            size_t pos = 0;
-            while ((pos = lineText.find(constant, pos)) != std::string::npos) {
-                if (!containsWordBetween("name(", ")", lineText, constant, pos)) {
-                    // Apply the choosen color
-                    int startPos = editor.PositionFromLine(i) + pos + offset;
-                    int endPos = startPos + constant.length();
-                    if (endPos > editor.GetLineEndPosition(i))
-                        endPos = editor.GetLineEndPosition(i);
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_PREPROCESSOR);
-                }
-                pos += constant.length();
-            }
-        }
-        // Find the basic abilities in the row
-        for (const std::string& basicability : basicabilities) {
-            size_t pos = 0;
-            while ((pos = lineText.find(basicability, pos)) != std::string::npos) {
-                if (!containsWordBetween("name(", ")", lineText, basicability, pos)) {
-                    // Apply the choosen color
-                    int startPos = editor.PositionFromLine(i) + pos + offset;
-                    int endPos = startPos + basicability.length();
-                    if (endPos > editor.GetLineEndPosition(i))
-                        endPos = editor.GetLineEndPosition(i);
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_PREPROCESSOR);
-                }
-                pos += basicability.length();
-            }
-        }
-        // Find the keywords in the row
-        for (const std::string& keyword : keywords) {
-            size_t pos = 0;
-            while ((pos = lineText.find(keyword, pos)) != std::string::npos) {
-                // Apply the choosen color
-                if (!containsWordBetween("name(", ")", lineText, keyword, pos)) {
-                    int startPos = editor.PositionFromLine(i) + pos + offset;
-                    int endPos = startPos + keyword.length();
-                    if (endPos > editor.GetLineEndPosition(i))
-                        endPos = editor.GetLineEndPosition(i);
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_WORD);
-                }
-                pos += keyword.length();
-            }
-        }
-        // Find the triggers in the row
-        for (const std::string& trigger : triggers) {
-            size_t pos = 0;
-            while ((pos = lineText.find(trigger, pos)) != std::string::npos) {
-                // Apply the choosen color
-                int startPos = editor.PositionFromLine(i) + pos + offset;
-                int endPos = startPos + trigger.length();
-                if (endPos > editor.GetLineEndPosition(i))
-                    endPos = editor.GetLineEndPosition(i);
-                ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_TASKMARKER);
-
-                pos += trigger.length();
-            }
-        }
-        // // Find the macros in the row (in maiuscolo)
-        std::transform(lineText.begin(), lineText.end(), lineText.begin(),
-            [](unsigned char c) { return std::toupper(c); });
-        for (const std::string& macro : macros) {
-            size_t pos = 0;
-            while ((pos = lineText.find(macro, pos)) != std::string::npos) {
-                // Apply the choosen color
-                int startPos = editor.PositionFromLine(i) + pos + offset;
-                int endPos = startPos + macro.length();
-                if (endPos > editor.GetLineEndPosition(i))
-                    endPos = editor.GetLineEndPosition(i);
-                ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_HASHQUOTEDSTRING);
-
-                pos += macro.length();
+                pos += word.length();
             }
         }
         // Check the unbalanced parenthesis
@@ -617,7 +566,7 @@ static void CheckWagicLineSyntax(int i) {
             }
         }
 
-        // Check if there are ( still remaining
+        // Check if there are '(' still remaining
         while (!bracketsStack1.empty()) {
             // Unbalanced opening parenthesis
             int startPos = bracketsStack1.top();
@@ -627,7 +576,7 @@ static void CheckWagicLineSyntax(int i) {
             bracketsStack1.pop();
         }
 
-        // Check if there are [ still remaining
+        // Check if there are '[' still remaining
         while (!bracketsStack2.empty()) {
             // Unbalanced opening parenthesis
             int startPos = bracketsStack2.top();
@@ -637,7 +586,7 @@ static void CheckWagicLineSyntax(int i) {
             bracketsStack2.pop();
         }
 
-        // Check if there are { still remaining
+        // Check if there are '{' still remaining
         while (!bracketsStack3.empty()) {
             // Unbalanced opening parenthesis
             int startPos = bracketsStack3.top();
@@ -647,7 +596,7 @@ static void CheckWagicLineSyntax(int i) {
             bracketsStack3.pop();
         }
 
-        //Check if there are $ still remaining
+        //Check if there are '$' still remaining
         while (!bracketsStack4.empty()) {
             // Unbalanced opening dollar
             int startPos = bracketsStack4.top();
@@ -657,7 +606,7 @@ static void CheckWagicLineSyntax(int i) {
             bracketsStack4.pop();
         }
 
-        // Check if there are ! still remaining
+        // Check if there are '!' still remaining
         int even = bracketsStack5.size() % 2;
         while (!bracketsStack5.empty()) {
             // Unbalanced opening mark
@@ -675,6 +624,16 @@ static void SetCurrentEditor() {
     int which = -1;
     SendMessage(nppData._nppHandle, NPPM_GETCURRENTSCINTILLA, SCI_UNUSED, (LPARAM)&which);
     editor = (which == 0) ? editor1 : editor2;
+
+    // Initialize the full vector starting from the single ones.
+    if (allVectors.empty()) {
+        allVectors.insert(allVectors.end(), zones.begin(), zones.end());
+        allVectors.insert(allVectors.end(), constants.begin(), constants.end());
+        allVectors.insert(allVectors.end(), basicabilities.begin(), basicabilities.end());
+        allVectors.insert(allVectors.end(), keywords.begin(), keywords.end());
+        allVectors.insert(allVectors.end(), triggers.begin(), triggers.end());
+        allVectors.insert(allVectors.end(), macros.begin(), macros.end());
+    }
 }
 
 LRESULT CALLBACK PluginWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
