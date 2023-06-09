@@ -6,7 +6,7 @@ The Plugin starts enabled, but you can disable it by using the plugin menu choic
 
 If the Plugin is disabled, you can activate it by using the plugin menu choice "Enable and Perform Current Line Syntax Check"
 
-The Plugin will automatically detects keywords, triggers, zones, macros and constants and it will highlights them using different colors:
+The Plugin will automatically detect keywords, triggers, zones, macros and constants and it will highlight them using different colors:
 - Blue style for keywords
 - Green style for comments
 - Bordeaux style for triggers
@@ -14,9 +14,9 @@ The Plugin will automatically detects keywords, triggers, zones, macros and cons
 - Orange style for macros
 - Gray style for macros
 
-The Plugin will automatially suggests Wagic keywords, triggers, zones, macros and constants by the popup menu (you can open it by pressing CTRL+SPACE).
+The Plugin will automatially suggest Wagic keywords, triggers, zones, macros and constants by the popup menu (you can open it by pressing CTRL+SPACE).
 
-The Plugin, by default, will performs inline syntax check on the current row, to activate the full file check you can use the choice "Enable and Perform All Lines Syntax Check", but this option can heavily slow down the editor if the file is very big.
+The Plugin, by default, will perform an inline syntax check on the current row, to activate the full file check you can use the choice "Enable and Perform All Lines Syntax Check", but this option can heavily slow down the editor when the file is very big.
 
 The Plugin will also automatially detect unbalanced parenthesis in the current row (or file) and it will highlight them with red color, and this is true for '()', '[]', '{}', '$$' and '!!' couples.
 
