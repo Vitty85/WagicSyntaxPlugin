@@ -2,9 +2,9 @@
 The Wagic Primitives Syntax Plugin for Notepad++
 
 ## Usage
-The Plugin starts enabled, but you can disable it by using the plugin menu choice "Disable Online Syntax Check"
+The Plugin starts enabled by deafault, but you can disable it by using the plugin menu choice "Disable Online Syntax Check"
 
-If the Plugin is disabled, you can activate it by using the plugin menu choice "Enable and Perform Current Line Syntax Check"
+When the Plugin is disabled, you can activate it by using the plugin menu choice "Enable and Perform Current Line Syntax Check"
 
 The Plugin will automatically detect keywords, triggers, zones, macros and constants and it will highlight them using different colors:
 - Blue style for keywords
@@ -14,11 +14,11 @@ The Plugin will automatically detect keywords, triggers, zones, macros and const
 - Orange style for macros
 - Gray style for macros
 
-The Plugin will automatially suggest Wagic keywords, triggers, zones, macros and constants by the popup menu (you can open it by pressing CTRL+SPACE).
+The Plugin will automatically suggest Wagic keywords, triggers, zones, macros and constants by the Notepad++ suggestions popup menu (you can open it by pressing CTRL+SPACE).
 
-The Plugin, by default, will perform an inline syntax check on the current row, to activate the full file check you can use the choice "Enable and Perform All Lines Syntax Check", but this option can heavily slow down the editor when the file is very big.
+When enabled, the Plugin will perform by default an inline syntax check on the current row, to activate the full file check you can use the choice "Enable and Perform All Lines Syntax Check", but this option can heavily slow down the editor when the file is very big.
 
-The Plugin will also automatially detect unbalanced parenthesis in the current row (or file) and it will highlight them with red color, and this is true for '()', '[]', '{}', '$$' and '!!' couples.
+The Plugin will automatially detect unbalanced parenthesis in the current row (or file) and it will highlight them with red color, and this is true for '()', '[]', '{}', '$$' and '!!' couples.
 
 ## Installation
 Donwload the relased zip file containing the WagicSyntaxPlugin.dll and unzip it inside your NotePad++ plugin folder, then restart the editor.
