@@ -426,18 +426,19 @@ static void CheckWagicLineSyntax(int i) {
         ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, editor.GetLineEndPosition(i) - editor.PositionFromLine(i), SCE_C_COMMENT);
         return;
     }
-    if (lineText[0] == '[' || !(lineText.find("text=") != 0 && lineText.find("name=") != 0 && lineText.find("power=") != 0 && lineText.find("toughness=") != 0 &&
-        lineText.find("type=") != 0 && lineText.find("subtype=") != 0 && lineText.find("grade=") != 0)) {
+    else {
+        // Set default color for row before the analysis
         ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, editor.PositionFromLine(i), 0x1f);
         ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, editor.GetLineEndPosition(i) - editor.PositionFromLine(i), SCE_C_OPERATOR);
-        return;
-    } else {
+    }
+    // Check if it's a row to control
+    if (lineText.find("text=") != 0 && lineText.find("name=") != 0 && lineText.find("power=") != 0 && lineText.find("toughness=") != 0 &&
+        lineText.find("type=") != 0 && lineText.find("subtype=") != 0 && lineText.find("grade=") != 0) {
         // Remove the row prefix
         int offset = lineText.find("=");
         if (offset < 0)
             return;
         lineText = lineText.substr(offset);
-
         // Find the all the possibile tokens in the current row
         for (const std::string& elem : allVectors) {
             size_t pos = 0;
