@@ -68,7 +68,7 @@ std::vector<std::string> keywords = {
     "(any)", "(blink)", "(blink)forsrc", "(blink)ueot", "(duplicateall)", "(halfall)", ",notrigger","ability$", "ability$!", "abilitycontroller", "absorb", "add,", "add{", "addtype(",
     "affinity(", "after<", " age ", "all(", "allsubtypes", "altercost(", "alterdevoffset:", "alterenergy:", "alterexperience:", "altermutationcounter:", "alternative", "alternativecostrule",
     "alterpoison:", "altersurvoffset:", "alteryidarocount:", "and!(", "any}", "aslongas(", "assorcery", "attackcost:", "attackcostrule", "attackedalone",
-    "attackpwcost:", "attackrule", "aura", "backside", "battleready", "becomes(", "becomesmonarch", "becomesmonarchfoeof", "becomesmonarchof", "belong", "bestow",
+    "attackpwcost:", "attackrule", "aura", "backside", "becomes(", "becomesmonarch", "becomesmonarchfoeof", "becomesmonarchof", "belong", "bestow",
     "bestowrule", "blockcost:", "blockcostrule", "blockrule", "bloodthirst:", "boasted", "bonusrule", "bottomoflibrary", "bstw", "bury", "bushido(",
     "buyback", "buybackrule", "cantargetcard(", "cantbeblockedby(", "cantbeblockerof(", "cantbetargetof(", "canuntap", "card(", "cards(", "cascade:", "castcard(", "castcard(restricted",
     "casted(", "cdaactive", "chain.wav", "changecost(", "charge", "checkex", "chooseaname", "clone", "coinflipped", "coloringest", "combatphases", "combatends",
@@ -78,15 +78,15 @@ std::vector<std::string> keywords = {
     "destroy", "didattack", "didblock", "didnotcastnontoken", "didntattack", "discard:", "discardbyopponent", "doboast", "doesntempty", "doforetell", "donothing", "dontremove", "dontshow",
     "dotrain", "doubleside(", "draw:", "dredgerule", "duplicate(all)", "duplicatecounters(", "dynamicability", "eachother", "epic", "equalto~", "equip", "equipment", "equipped", "evicttypes",
     "evolve", "except", "exchangelife", "exert", "exilecast", "exileimp", "exploits", "explores", "facedown", "facedup", "faceup", "fade", "fading:", "fizzle ", "fizzle!", "?fizzle]", "fizzleto(", "flanker", "flanking",
-    "flashbackrule", "flip(", "flipped", "foelost(", "fog", "forceclean", "forcedalive", "forcefield", "forcetype(", "foreach(", "forever", "freeze", "from", "from(", "fromplay", "frozen",
+    "flashbackrule", "flip(", "flipped", "foelost(", "fog", "forceclean", "forcedalive", "forcefield", "forcetype(", "foreach(", "forever", "freeze", "from(", "fromplay", "frozen",
     "gravecast", "half(all)", "hand(blink)", "hasdead", "hasdefender", "hasexerted", "haunt", "haunted", "head", "hiddenmoveto(", "hmodifer:", "identify", "imprint", "imprintedcard",
     "ingest:", "itself", "kamiflip", "keepname", "kicked!:", "kicker", "kickerrule", "lastturn(", "legendrule", "lessorequalcreatures", "lessorequallands", "lessthan~", "level", "librarybottom", "librarycast",
     "librarysecond", "librarytop", "life:", "lifeleech:", "lifelinkrule", "lifeloss", "lifeset:", "limit:", "limit^", "livingweapon", "lord(", "loseabilities", "loseability", "losesatype(", "losesubtypesof(",
     "lost", "loyalty", "madnessplayed", "manafaceup", "manapool", "manifest", "max", "maxcast(", "maxlevel:", "maxplay(", "meld(", "meldfrom(", "message(", "miracle", "modbenchant(",
     "morbid", "morecardsthanopponent", "morethan~", "morph", "morphrule", "most", "movedto(", "moverandom(", "moveto(", "mutated", "mutateover", "mutateunder", "mutationover:", "mutationunder:", " my ", "myfoe",
     "myname", "myorigname", "myself", "myturnonly", "name", "named!:", "nameingest", "never", "newability[", "newcolors", "newhook", "newtarget", "next", "nextphase", "ninjutsu", "noevent",
-    "nolegend", "nonbasicland", "nonstatic", "noreplace", "normal", "notatarget(", "notblocked", "notdelirum", "notexerted", "notpaid", "notrg", "notrigger", "once", "oneonecounters", "oneshot", "only", " opponent",
-    "opponent ", "opponentdamagedbycombat", "opponentpoisoned", "opponentpool", "opponentscontrol", "opponentturnonly", "options(", "out ", "outnumbered", "overload", "overloadrule", "ownerscontrol", "paid(", "paidmana",
+    "nolegend", "nonbasicland", "nonstatic", "noreplace", "normal", "notatarget(", "notblocked", "notdelirum", "notexerted", "notpaid", "notrg", "notrigger", "once", "oneonecounters", "oneshot", "only", " opponent ", " opponent\r",
+    " opponent\m", "opponent ", "opponentdamagedbycombat", "opponentpoisoned", "opponentpool", "opponentscontrol", "opponentturnonly", "options(", "out ", "outnumbered", "overload", "overloadrule", "ownerscontrol", "paid(", "paidmana",
     "pay(", "pay[", "payzerorule", "persistrule", "phaseaction", "phaseactionmulti", "phasealter(", "phasedin", "phaseout", "placefromthetop(", "planeswalkerattack", "planeswalkerdamage", "planeswalkerrule", "plus(1)",
     "plus(2)", "plus(3)", "plus(4)", "plus(5)", "poolsave(", "positive", "powermorethancontrollerhand", "powermorethanopponenthand", "prevent:", "preventallcombatdamage", "preventalldamage", "preventallnoncombatdamage",
     "previous", "producecolor:", "produceextra:", "proliferate", "propagate", "provoke", "prowl(", "pumpboth", "pumppow", "pumptough", "putinplay", "putinplayrule", "raid", "rampage(", "randomcard", "rebound", "reconfigure",
@@ -178,7 +178,7 @@ std::vector<std::string> constants = {
     "blocked", "blocking", "c_black", "c_blue", "c_extra", "c_green", "c_red", "c_white", "cantarget ", "cardid", "children", "cmana", "color ", "controllerdamager", "damaged", "damager", "description", "discarded", "dredgeable", 
     "enchanted", "equals", "equipped", "evictname", "exerted", "expansion", "extracostshadow", "foretold", "geared", "hasbackside", "hasconvoke", "hasflashback", "haskicker", "haspartner", "hasx", "icon", "lastnamechosen", 
     "leveler", "manab", "manacost", "manag", "manar", "manau", "manaw", "mtgid", "multicolor", "mychild", "mycurses", "myeqp", "mysource", "mytgt", "mytotem", "notshare!", "numofcols", "opponentdamager", "pairable", "parents", 
-    "partname", "preyname", "proliferation", "rarity", "recent", "shadow", "share!", "sourcecard", "storedname", "tapped", "targetedplayer", "targetter", "title", "unknown", "upto:", "zpos", "notany}"
+    "partname", "preyname", "proliferation", "rarity", "recent", "shadow", "share!", "sourcecard", "storedname", "tapped", "targetedplayer", "targetter", "title", "unknown", "upto:", "zpos", "notany}", "modified", "battleready"
     // Add any additional Wagic constant here
 };
 
