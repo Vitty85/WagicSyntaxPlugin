@@ -2,7 +2,7 @@
 The Wagic Primitives Syntax Plugin for Notepad++
 
 ## Usage
-The Plugin starts enabled by deafault, but you can disable it by using the plugin menu choice "Disable Online Syntax Check"
+The Plugin starts enabled by default, but you can disable it by using the plugin menu choice "Disable Online Syntax Check"
 
 When the Plugin is disabled, you can activate it by using the plugin menu choice "Enable and Perform Current Line Syntax Check"
 
@@ -18,12 +18,12 @@ The Plugin will automatically suggest Wagic keywords, triggers, zones, macros an
 
 When enabled, the Plugin will perform by default an inline syntax check on the current row, to activate the full file check you can use the choice "Enable and Perform All Lines Syntax Check", but this option can heavily slow down the editor when the file is very big.
 
-The Plugin will automatially detect unbalanced parenthesis in the current row (or file) and it will highlight them with red color, and this is true for '()', '[]', '{}', '$$' and '!!' couples.
+The Plugin will automatically detect unbalanced parenthesis in the current row (or file) and it will highlight them with red color, and this is true for '()', '[]', '{}', '$$' and '!!' couples.
 
 ## Installation
-Donwload the relased zip file containing the WagicSyntaxPlugin.dll and unzip it inside your NotePad++ plugin folder, then restart the editor.
+Download the released zip file containing the WagicSyntaxPlugin.dll in its own subfolder and unzip it inside your NotePad++ plugin folder, then restart the editor.
 
-BE AWARE: Currently the release is compiled for 64bit version, to use it on 32bit version you should recoimpile the DLL on the target architecture.
+BE AWARE: Currently the release is compiled for 64bit version, to use it on 32bit version you should recompile the DLL on the target architecture.
 
 ## Development
 The code is developed using Visual Studio 2019. Building the code will generate a DLL which can be used by Notepad++. For convenience, Visual Studio copies the DLL into the Notepad++ plugin directory.
