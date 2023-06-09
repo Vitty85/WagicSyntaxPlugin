@@ -65,13 +65,13 @@ static FuncItem menuItems[] = {
 
 // List of Wagic keywords
 std::vector<std::string> keywords = {
-    "(any)", "(blink)", "(blink)forsrc", "(blink)ueot", "(duplicateall)", "(halfall)", ",notrigger","ability$", "ability$!", "abilitycontroller", "absorb", "add{", "addtype(",
+    "(any)", "(blink)", "(blink)forsrc", "(blink)ueot", "(duplicateall)", "(halfall)", ",notrigger","ability$", "ability$!", "abilitycontroller", "absorb", "add,", "add{", "addtype(",
     "affinity(", "after<", " age ", "all(", "allsubtypes", "altercost(", "alterdevoffset:", "alterenergy:", "alterexperience:", "altermutationcounter:", "alternative", "alternativecostrule",
     "alterpoison:", "altersurvoffset:", "alteryidarocount:", "and!(", "any}", "aslongas(", "assorcery", "attackcost:", "attackcostrule", "attackedalone",
     "attackpwcost:", "attackrule", "aura", "backside", "battleready", "becomes(", "becomesmonarch", "becomesmonarchfoeof", "becomesmonarchof", "belong", "bestow",
     "bestowrule", "blockcost:", "blockcostrule", "blockrule", "bloodthirst:", "boasted", "bonusrule", "bottomoflibrary", "bstw", "bury", "bushido(",
     "buyback", "buybackrule", "cantargetcard(", "cantbeblockedby(", "cantbeblockerof(", "cantbetargetof(", "canuntap", "card(", "cards(", "cascade:", "castcard(", "castcard(restricted",
-    "casted(", "cdaactive", "chain.wav", "changecost(", "charge", "checkex", "chooseaname", "clone", "coinflipped", "coloringest",
+    "casted(", "cdaactive", "chain.wav", "changecost(", "charge", "checkex", "chooseaname", "clone", "coinflipped", "coloringest", "combatphases", "combatends",
     "colors", "combatspiritlink", "combattriggerrule", "commandzonecast", "compare(", "completedungeon:", "conjure", "connect", "connectrule", "continue",
     "controller", "copied", "copiedacard", "copy", "costx!:", "count(", "countb(", "counter(", "counteradded(", "countermod(", "counterremoved(", "countershroud(", "countersoneone",
     "countertrack(", "coven", "create(", "cumulativeupcost", "cycled", "damage:", "deadcreart", "deadpermanent", "deathtouchrule", "defense", "delayed", "delirium", "deplete:",
