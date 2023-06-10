@@ -12,7 +12,7 @@ The Plugin will automatically detect keywords, triggers, zones, macros and const
 - Bordeaux style for triggers
 - Purple style for zones
 - Orange style for macros
-- Gray style for macros
+- Gray style for constants and basic abilities
 - Red style for unkown or wrong words
 
 The Plugin will automatically suggest Wagic keywords, triggers, zones, macros and constants by the Notepad++ suggestions popup menu (you can open it by pressing CTRL+SPACE).
