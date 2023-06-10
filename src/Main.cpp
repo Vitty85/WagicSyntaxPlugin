@@ -30,6 +30,9 @@
 #include <stack>
 #include <map>
 
+#include <iostream>
+#include <fstream>
+
 // The Scintilla Plugin Windows Proc
 WNDPROC OldPluginWndProc = nullptr;
 // The handle to the current DLL Module
@@ -42,8 +45,12 @@ static ScintillaEditor editor1;
 static ScintillaEditor editor2;
 // References the current editor
 static ScintillaEditor editor;
-
+// The plugin activation control flag
 static bool active = false;
+
+// List of wrong words found during analysis
+std::vector<std::string> errorList;
+static bool debug = false;
 
 // Forward declaration of menu callbacks
 static void SetStyles();
@@ -63,41 +70,53 @@ static FuncItem menuItems[] = {
 	{ L"About...", showAbout, 0, false, nullptr }
 };
 
-// List of Wagic keywords
 std::vector<std::string> keywords = {
-    "(any)", "(blink)", "(blink)forsrc", "(blink)ueot", "(duplicateall)", "(halfall)", ",notrigger","ability$", "ability$!", "abilitycontroller", "absorb", "add,", "add{", "addtype(",
-    "affinity(", "after<", " age ", "all(", "allsubtypes", "altercost(", "alterdevoffset:", "alterenergy:", "alterexperience:", "altermutationcounter:", "alternative", "alternativecostrule",
-    "alterpoison:", "altersurvoffset:", "alteryidarocount:", "and!(", "any}", "aslongas(", "assorcery", "attackcost:", "attackcostrule", "attackedalone",
-    "attackpwcost:", "attackrule", "aura", "backside", "becomes(", "becomesmonarch", "becomesmonarchfoeof", "becomesmonarchof", "belong", "bestow",
-    "bestowrule", "blockcost:", "blockcostrule", "blockrule", "bloodthirst:", "boasted", "bonusrule", "bottomoflibrary", "bstw", "bury", "bushido(",
-    "buyback", "buybackrule", "cantargetcard(", "cantbeblockedby(", "cantbeblockerof(", "cantbetargetof(", "canuntap", "card(", "cards(", "cascade:", "castcard(", "castcard(restricted",
-    "casted(", "cdaactive", "chain.wav", "changecost(", "charge", "checkex", "chooseaname", "clone", "coinflipped", "coloringest", "combatphases", "combatends",
-    "colors", "combatspiritlink", "combattriggerrule", "commandzonecast", "compare(", "completedungeon:", "conjure", "connect", "connectrule", "continue",
-    "controller", "copied", "copiedacard", "copy", "costx!:", "count(", "countb(", "counter(", "counteradded(", "countermod(", "counterremoved(", "countershroud(", "countersoneone",
-    "countertrack(", "coven", "create(", "cumulativeupcost", "cycled", "damage:", "deadcreart", "deadpermanent", "deathtouchrule", "defense", "delayed", "delirium", "deplete:",
-    "destroy", "didattack", "didblock", "didnotcastnontoken", "didntattack", "discard:", "discardbyopponent", "doboast", "doesntempty", "doforetell", "donothing", "dontremove", "dontshow",
-    "dotrain", "doubleside(", "draw:", "dredgerule", "duplicate(all)", "duplicatecounters(", "dynamicability", "eachother", "epic", "equalto~", "equip", "equipment", "equipped", "evicttypes",
-    "evolve", "except", "exchangelife", "exert", "exilecast", "exileimp", "exploits", "explores", "facedown", "facedup", "faceup", "fade", "fading:", "fizzle ", "fizzle!", "?fizzle]", "fizzleto(", "flanker", "flanking",
-    "flashbackrule", "flip(", "flipped", "foelost(", "fog", "forceclean", "forcedalive", "forcefield", "forcetype(", "foreach(", "forever", "freeze", "from(", "fromplay", "frozen",
-    "gravecast", "half(all)", "hand(blink)", "hasdead", "hasdefender", "hasexerted", "haunt", "haunted", "head", "hiddenmoveto(", "hmodifer:", "identify", "imprint", "imprintedcard",
-    "ingest:", "itself", "kamiflip", "keepname", "kicked!:", "kicker", "kickerrule", "lastturn(", "legendrule", "lessorequalcreatures", "lessorequallands", "lessthan~", "level", "librarybottom", "librarycast",
-    "librarysecond", "librarytop", "life:", "lifeleech:", "lifelinkrule", "lifeloss", "lifeset:", "limit:", "limit^", "livingweapon", "lord(", "loseabilities", "loseability", "losesatype(", "losesubtypesof(",
-    "lost", "loyalty", "madnessplayed", "manafaceup", "manapool", "manifest", "max", "maxcast(", "maxlevel:", "maxplay(", "meld(", "meldfrom(", "message(", "miracle", "modbenchant(",
-    "morbid", "morecardsthanopponent", "morethan~", "morph", "morphrule", "most", "movedto(", "moverandom(", "moveto(", "mutated", "mutateover", "mutateunder", "mutationover:", "mutationunder:", " my ", "myfoe",
-    "myname", "myorigname", "myself", "myturnonly", "name", "named!:", "nameingest", "never", "newability[", "newcolors", "newhook", "newtarget", "next", "nextphase", "ninjutsu", "noevent",
-    "nolegend", "nonbasicland", "nonstatic", "noreplace", "normal", "notatarget(", "notblocked", "notdelirum", "notexerted", "notpaid", "notrg", "notrigger", "once", "oneonecounters", "oneshot", "only", " opponent ", " opponent\r",
-    " opponent\m", "opponent ", "opponentdamagedbycombat", "opponentpoisoned", "opponentpool", "opponentscontrol", "opponentturnonly", "options(", "out ", "outnumbered", "overload", "overloadrule", "ownerscontrol", "paid(", "paidmana",
-    "pay(", "pay[", "payzerorule", "persistrule", "phaseaction", "phaseactionmulti", "phasealter(", "phasedin", "phaseout", "placefromthetop(", "planeswalkerattack", "planeswalkerdamage", "planeswalkerrule", "plus(1)",
-    "plus(2)", "plus(3)", "plus(4)", "plus(5)", "poolsave(", "positive", "powermorethancontrollerhand", "powermorethanopponenthand", "prevent:", "preventallcombatdamage", "preventalldamage", "preventallnoncombatdamage",
-    "previous", "producecolor:", "produceextra:", "proliferate", "propagate", "provoke", "prowl(", "pumpboth", "pumppow", "pumptough", "putinplay", "putinplayrule", "raid", "rampage(", "randomcard", "rebound", "reconfigure",
-    "reduce(", "reduceto:", "regenerate", "rehook", "reject", "remake(", "removeallcounters(", "removealltypes", "removecreaturesubtypes", "removedfromgame", "removefromcombat", "removemana(", "removemc", "removesinglecountertype(",
-    "removetypes", "repeat", "resetdamage", "restricted", "restriction{", "result(", "retarget", "retrace", "retracerule", "return(", "reveal:", "revealend", "revealtype(", "revealuntil(", "revealzone(", "revolt", "sacrifice",
-    "scry:", "scryend", "scryzone(", "selectmana", "serumpowder", "setblocker", "sethand:", "setpower=", "settoughness=", "shackle", "shuffle", "sidecast", "single", "skill", "soulbondrule", "source",
-    "sourceinplay", "sourcenottap", "sourcetap", "spellmover(", "spent(", "spiritlink", "srccontroller", "srcopponent", "standard", "steal", "surveil", "suspended", "suspendrule", "swap", "tail", "tails",
-    "takeninitiativeof", "taketheinitiative", "tap", "target(", "targetcontroller", "targetopponent", "teach(", "terminate", "text", "thatmuch", "(this", "this(", "thisforeach(", "thisturn(", "time", "toughnesslifegain", "to(", "[to]", "token(",
-    "tokencleanuprule", "tokencreated", "tosrc", "total(", "trained", "trainer", "transforms(", "trigger", "turn:", "turnlimited", "turns:", "tutorial(", "type:", "type(", "uent", "ueot", "undocpy", "unearthrule",
-    "untap", "upcost", "upcostmulti", "uynt", "vampired", "vampirerule", "vanishing:", "while(", "winability", "wingame", "with(", "withenchant", "won", "zerodead", "zone(", "if ", "then ", "else ", "activate",
-    "unattach", "choice", "may", "foreach", "aslongas", " beforenextturn", "~morethan~", "~lessthan~", "~equalto~", "other "
+    "any", "blink", "forsrc", "duplicateall", "halfall", "notrigger", "ability", "abilitycontroller", "absorb", "add", "addtype", "novent",
+    "affinity", "after", "age", "all", "allsubtypes", "altercost", "alterdevoffset", "alterenergy", "alterexperience", "altermutationcounter", 
+    "alternative", "alternativecostrule", "alterpoison", "altersurvoffset", "alteryidarocount", "and", "any", "aslongas", "assorcery", 
+    "attackcost", "attackcostrule", "attackedalone", "attackpwcost", "attackrule", "aura", "backside", "becomes", "becomesmonarch", 
+    "becomesmonarchfoeof", "becomesmonarchof", "belong", "bestow", "bestowrule", "blockcost", "blockcostrule", "blockrule", "bloodthirst", 
+    "boasted", "bonusrule", "bottomoflibrary", "bstw", "bury", "bushido", "buyback", "buybackrule", "cantargetcard", "cantbeblockedby", 
+    "cantbeblockerof", "cantbetargetof", "canuntap", "card", "cards", "cascade", "castcard", "restricted", "casted", "cdaactive", "changecost", 
+    "charge", "checkex", "chooseaname", "clone", "coinflipped", "coloringest", "combatphases", "combatends", "colors", "combatspiritlink", 
+    "combattriggerrule", "commandzonecast", "compare", "completedungeon", "conjure", "connect", "connectrule", "continue", "controller", "copied", 
+    "copiedacard", "copy", "costx", "count", "countb", "counter", "countermod", "counterremoved", "countershroud", "countersoneone",
+    "countertrack", "coven", "create", "cumulativeupcost", "cycled", "damage", "deadcreart", "deadpermanent", "deathtouchrule", "defense", "delayed", "delirium", "deplete",
+    "destroy", "didattack", "didblock", "didnotcastnontoken", "didntattack", "discard", "discardbyopponent", "doboast", "doesntempty", "doforetell", "donothing", "dontremove", "dontshow",
+    "dotrain", "doubleside", "draw", "dredgerule", "duplicate", "duplicatecounters", "dynamicability", "eachother", "epic", "equalto", "equalto~", "equip", "equipment", "equipped", "evicttypes",
+    "evolve", "except", "exchangelife", "exert", "exilecast", "exileimp", "exploits", "explores", "facedown", "facedup", "faceup", "fade", "fading", "fizzle", "fizzleto", "flanker", "flanking",
+    "flashbackrule", "flip", "flipped", "foelost", "fog", "forceclean", "forcedalive", "forcefield", "forcetype", "foreach", "forever", "freeze", "from", "fromplay", "frozen",
+    "gravecast", "half", "hasdead", "hasdefender", "hasexerted", "haunt", "haunted", "head", "hiddenmoveto", "hmodifer", "identify", "imprint", "imprintedcard",
+    "ingest", "itself", "kamiflip", "keepname", "kicked!", "kicker", "kickerrule", "lastturn", "legendrule", "lessorequalcreatures", "lessorequallands", "lessthan", "lessthan~", "level", "librarybottom", "librarycast",
+    "librarysecond", "librarytop", "life", "lifeleech", "lifelinkrule", "lifeloss", "lifeset", "limit", "limit^", "livingweapon", "lord", "loseabilities", "loseability", "losesatype", "losesubtypesof",
+    "lost", "loyalty", "madnessplayed", "manafaceup", "manapool", "manifest", "max", "maxcast", "maxlevel", "maxplay", "meld", "meldfrom", "message", "miracle", "modbenchant",
+    "morbid", "morecardsthanopponent", "morethan", "morethan~", "morph", "morphrule", "most", "movedto", "moverandom", "moveto", "mutated", "mutateover", "mutateunder", "mutationover", "mutationunder", "myfoe",
+    "myname", "myorigname", "myself", "myturnonly", "name", "named!", "nameingest", "never", "newability", "newcolors", "newhook", "newtarget", "next", "nextphase", "ninjutsu", "noevent",
+    "nolegend", "nonbasicland", "nonstatic", "noreplace", "normal", "notatarget", "notblocked", "notdelirum", "notexerted", "notpaid", "notrg", "notrigger", "once", "oneonecounters", "oneshot", "only",
+    "opponent", "opponentdamagedbycombat", "opponentpoisoned", "opponentpool", "opponentscontrol", "opponentturnonly", "options", "out", "outnumbered", "overload", "overloadrule", "ownerscontrol", "paid", "paidmana",
+    "pay", "payzerorule", "persistrule", "phaseaction", "phaseactionmulti", "phasealter", "phasedin", "phaseout", "placefromthetop", "planeswalkerattack", "planeswalkerdamage", "planeswalkerrule", "plus",
+    "poolsave", "positive", "powermorethancontrollerhand", "powermorethanopponenthand", "prevent", "preventallcombatdamage", "preventalldamage", "preventallnoncombatdamage",
+    "previous", "producecolor", "produceextra", "proliferate", "propagate", "provoke", "prowl", "pumpboth", "pumppow", "pumptough", "putinplay", "putinplayrule", "raid", "rampage", "randomcard", "rebound", "reconfigure",
+    "reduce", "reduceto", "regenerate", "rehook", "reject", "remake", "removeallcounters", "removealltypes", "removecreaturesubtypes", "removedfromgame", "removefromcombat", "removemana", "removemc", "removesinglecountertype",
+    "removetypes", "repeat", "resetdamage", "restricted", "restriction", "result", "retarget", "retrace", "retracerule", "return", "reveal", "revealend", "revealtype", "revealuntil", "revealzone", "revolt", "sacrifice",
+    "scry", "scryend", "scryzone", "selectmana", "serumpowder", "setblocker", "sethand", "setpower", "settoughness", "shackle", "shuffle", "sidecast", "single", "skill", "soulbondrule", "source",
+    "sourceinplay", "sourcenottap", "sourcetap", "spellmover", "spent", "spiritlink", "srccontroller", "srcopponent", "standard", "steal", "surveil", "suspended", "suspendrule", "swap", "tail", "tails",
+    "takeninitiativeof", "taketheinitiative", "tap", "target", "targetcontroller", "targetopponent", "teach", "terminate", "text", "thatmuch", "this", "thisforeach", "thisturn", "time", "toughnesslifegain", "to", "token",
+    "tokencleanuprule", "tokencreated", "tosrc", "total", "trained", "trainer", "transforms", "trigger", "turn", "turnlimited", "turns", "tutorial", "type", "type", "uent", "ueot", "undocpy", "unearthrule",
+    "untap", "upcost", "upcostmulti", "uynt", "vampired", "vampirerule", "vanishing", "while", "winability", "wingame", "with", "withenchant", "won", "zerodead", "zone", "if", "then", "else", "activate",
+    "unattach", "choice", "may", "foreach", "aslongas", "beforenextturn", "~morethan~", "~lessthan~", "~equalto~", "other", "loseabilityend", "rolld", "end", "afterrevealed", "afterrevealedend", 
+    "variable", "winabilityend", "and", "chooseanameopp", "chooseaname", "chooseend", "nonland", "upkeep", "optionone", "optiononeend", "optiontwo", "optiontwoend",
+    "my", "ifnot", "blockers", "combatbegins", "multi", "powerstrike", "can", "play", "endofturn", "replacedraw", "cycle", "nextphasealter", "scrycore", 
+    "scrycoreend", "named", "beginofturn", "firstmain", "livingweapontoken", "flipacoin", "flipend", "chooseatype", "drawonly", "firstmainonly",
+    "secondmain", "chooseacolor", "retargetfromplay", "attackersonly", "blockersonly", "combatdamageonly", "combatendsonly", "combatbeginsonly", "activatechooseacolor", 
+    "activatechooseend", "powerpumpboth", "targetedpersonsbattlefield", "myattackersonly", "combat", "manacostlifestrike", "chargedraw",
+    "toughnesslifeloss", "manastrike", "activatedability", "each", "remove", "manacostlifeloss", "combatbegin", "combatattackers", 
+    "combatblockers", "combatend", "grant", "grantend", "opponentupkeeponly", "myupkeeponly", "manacostlifestrike", "toughnesslifeloss", "main", "powerpumppow",
+    "manacostlifelose", "opponentreplacedraw", "chosencolorend", "activatechooseatype", "combatphaseswithmain", "agecountersoneone",
+    "cantblocktarget", "endstep", "before", "attackers", "during", "dredge", "cleanup", "manacostlifegain", "opponentblockersonly", "powerlifegain", "cumulativeupcostmulti", 
+    "sourcenottapped", "oneonecountersstrike", "powercountersoneone", "powerlifeloss", "manacoststrike", "chargelifegain", "myupkeep", "untaponly",
+    "toughnesstrike", "chargedeplete", "chargestrike", "manacostpumppow", "didcombatdamagetofoe", "manacostpumpboth", "manacostpumptough", "powerdraw", 
+    "colorspumpboth", "postbattle", "nonwall", "value", "twist", "emblem"
     // Add any additional Wagic keyword here
 };
 
@@ -109,8 +128,10 @@ std::vector<std::string> zones = {
     "mysideboard", "mycommandzone", "myreveal", "mygraveyard", "mybattlefield", "myhand", "mylibrary", "mystack", "myexile",
     "opponentsideboard", "opponentcommandzone", "opponentreveal", "opponentgraveyard", "opponentbattlefield", "opponenthand",
     "opponentlibrary", "opponentstack", "opponentexile","ownersideboard", "ownercommandzone", "ownerreveal", "ownergraveyard",
-    "ownerbattlefield", "ownerinplay", "ownerhand", "ownerlibrary", "ownerstack", "ownerexile", "sideboard)", "commandzone)", "reveal)",
-    "graveyard)", "battlefield)", "inplay)", "hand)", "library)", "nonbattlezone)", "stack", "exile)", "previousbattlefield"
+    "ownerbattlefield", "ownerinplay", "ownerhand", "ownerlibrary", "ownerstack", "ownerexile", "sideboard", "commandzone", "reveal",
+    "graveyard", "battlefield", "inplay", "hand", "library", "nonbattlezone", "stack", "exile", "previousbattlefield",
+    "targetcontrollerbattlefield", "targetedpersonslibrary", "targetedplayerbattlefield", "targetcontrollergraveyard", "targetedpersonsstack", 
+    "targetedpersonsgraveyard", "targetedpersonshand", "targetcontrollerlibrary"
     // Add any additional Wagic zone here
 };
 
@@ -148,7 +169,7 @@ std::vector<std::string> macros = {
     "_FORETELL_", "_LOOT_", "_UNEARTH_", "__PLAY_TOP_FROM_EXILE__", "_WARD_", "_RENOWN_", "_BLINK_UEOT_", "_CONNIVES_", "_ETERNALIZE_",
     "_DISCARD&DRAW_", "_PUNCH_", "_MUST_BE_BLOCKD_", "_ANGELTOKEN_", "_BEASTTOKEN_", "_DRAGONTOKEN_", "_ELEPHANTTOKEN_", "_GOBLINTOKEN_",
     "_INSECTTOKEN_", "_KNIGHTTOKEN_", "_PHYREXIANMITETOKEN_", "_REDELEMENTALTOKEN_", "_SAPROLINGTOKEN_", "_SERVOTOKEN_", "_SOLDIERTOKEN_",
-    "_SPIRITTOKEN_", "_THOPTERTOKEN_", "_WOLFTOKEN_", "_ZOMBIETOKEN_"
+    "_SPIRITTOKEN_", "_THOPTERTOKEN_", "_WOLFTOKEN_", "_ZOMBIETOKEN_", "_HARNESSED_CONTROL_", "_HARNESSED_LIGHTNING_"
     // Add any additional Wagic macro here
 };
 
@@ -156,7 +177,7 @@ std::vector<std::string> macros = {
 std::vector<std::string> constants = {
     "abundantlife", "allbattlefieldcardtypes", "allgravecardtypes", "allmyname", "anycnt", "auras", "azorius", "boros", "bothalldead", "bushidopoints", "calculateparty", "canforetellcast",
     "cantargetcre", "cantargetmycre", "cantargetoppocre", "cardcountabil", "cardcounttype", "castx", "chosencolor", "chosenname", "chosentype", "commonblack", "commonblue", "commongreen", "commonred", "commonwhite",
-    "controllerturn", "converge", "convertedcost:", "countallspell", "countedamount", "countedbamount", "counter{", "countmycrespell", "countmynoncrespell", "crewtotalpower", "currentphase", "currentturn",
+    "controllerturn", "converge", "convertedcost:", "countallspell", "countedamount", "countedbamount", "countmycrespell", "countmynoncrespell", "crewtotalpower", "currentphase", "currentturn",
     "cursedscrollresult", "diffcardcountabil", "diffcardcounttype", "dimir", "direction", "dualfaced", "epicactivated", "evictb", "evictg", "evictmc", "evictpw", "evictr", "evictth", "evictu",
     "evictw", "excessdamage", "findfirsttype", "findlasttype", "fivetimes", "fourtimes", "fullpaid", "gear", "genrand", "golgari", "gruul", "halfdown", "halfpaid", "halfup", "handsize", "hasability", "hascnt",
     "hasevict", "hasmansym", "hasprey", "hasstorecard", "highest", "highestlifetotal", "iscopied", "isflipped", "ishuman", "izzet", "kicked", "lastdiefaces", "lastflipchoice", "lastflipresult", "lastrollchoice",
@@ -170,26 +191,59 @@ std::vector<std::string> constants = {
     "opponentwhitepoolcount", "oppototalcololorsinplay", "oppototalmana", "oppsametypecreatures", "orzhov", "ostartinglife", "ostormcount", "osurveiloffset", "otherconvertedcost", "otherpower", "othertoughness", "othertype",
     "oyidarocount", "palldead", "pancientooze", "pattackedcount", "pbasiclandtypes", "pcoven", "pcycledcount", "pdauntless", "pdcount", "pdevotionoffset", "pdiffinitlife", "pdnoncount", "pdomain", "pdrewcount", "pdungeoncompleted",
     "penergy", "permanent", "pexperience", "pgbzombie", "pginstantsorcery", "pgmanainstantsorcery", "phalfinitlife", "phandcount", "pinitiative", "pinstsorcount", "plandb", "plandc", "plandg", "plandr", "plandu", "plandw",
-    "plastshlturn", "plibrarycount", "plus", "plusend", "pmonarch", "pnumcreswp", "pnumofcommandcast", "pnumofidentitycols", "power", "powertotalinplay", "prex", "prodmana", "pstormcount", "psurveiloffset", "pwr:", "pwrtotalinplay",
+    "plastshlturn", "plibrarycount", "plus", "plusend", "pmonarch", "pnumcreswp", "pnumofcommandcast", "pnumofidentitycols", "power", "powertotalinplay", "prex", "prodmana", "pstormcount", "psurveiloffset", "pwr", "pwrtotalinplay",
     "pwrtotatt", "pwrtotblo", "pyidarocount", "rakdos", "restriction{", "revealedmana", "revealedp", "revealedt", "sametypecreatures", "scryedcards", "selesnya", "simic", "snowdiffmana", "srclastdiefaces", "srclastrollchoice",
     "srclastrollresult", "startinglife", "startingplayer", "stored", "sunburst", "targetedcurses", "thatmuch", "thirddown", "thirdpaid", "thirdup", "thrice", "ths:", "thstotalinplay", "thstotatt", "thstotblo", "totalcololorsinplay",
     "totaldmg", "totalmana", "totcnt", "totcntall", "totcntart", "totcntbat", "totcntcre", "totcntenc", "totcntlan", "totcntpla", "totmanaspent", "toughness", "toughnesstotalinplay", "treefolk", "twice", "urzatron", "usedmana",
-    "withpartner", "worshipped", "colorless", "green", "blue", "red", "black", "white", "waste", "alternative", "buyback", "flashback", "retrace", "kicker", "facedown", "bestow","anyamount","attacking", "backname", " blockable ", 
-    "blocked", "blocking", "c_black", "c_blue", "c_extra", "c_green", "c_red", "c_white", "cantarget ", "cardid", "children", "cmana", "color ", "controllerdamager", "damaged", "damager", "description", "discarded", "dredgeable", 
+    "withpartner", "worshipped", "colorless", "green", "blue", "red", "black", "white", "waste", "alternative", "buyback", "flashback", "retrace", "kicker", "facedown", "bestow","anyamount","attacking", "backname", " blockable", 
+    "blocked", "blocking", "cantarget ", "cardid", "children", "cmana", "color ", "controllerdamager", "damaged", "damager", "description", "discarded", "dredgeable", 
     "enchanted", "equals", "equipped", "evictname", "exerted", "expansion", "extracostshadow", "foretold", "geared", "hasbackside", "hasconvoke", "hasflashback", "haskicker", "haspartner", "hasx", "icon", "lastnamechosen", 
     "leveler", "manab", "manacost", "manag", "manar", "manau", "manaw", "mtgid", "multicolor", "mychild", "mycurses", "myeqp", "mysource", "mytgt", "mytotem", "notshare!", "numofcols", "opponentdamager", "pairable", "parents", 
-    "partname", "preyname", "proliferation", "rarity", "recent", "shadow", "share!", "sourcecard", "storedname", "tapped", "targetedplayer", "targetter", "title", "unknown", "upto:", "zpos", "notany}", "modified", "battleready"
+    "partname", "preyname", "proliferation", "rarity", "recent", "shadow", "share", "sourcecard", "storedname", "tapped", "targetedplayer", "targetter", "title", "unknown", "upto", "zpos", "notany", "modified", "battleready",
+    "storedmanacost", "storedpower", "storedtoughness", "storedx", "storedthatmuch", "storedmanacostplus", "storedhalfdownpower", "mystored", "storedhascnt", "mygraveyardplustype",
+    "mybattlefieldplusend", "mybattlefieldplustype", "opponentbattlefieldplusend", "findfirsttypenonland", "hascntacolyteffect", "share", "types",
+    "hascnttime", "twicetype", "findfirsttypecreature", "lifetotalminusstartinglifeminusend", "controllerlife", "currentturnplus", "twicepower", "countedamountplus",
+    "hascntperpetualcollector", "findfirsttypecreature", "halfdownusedmanau", "halfdownusedmanab", "halfdownusedmanar", "convertedcost", "untapped",
+    "opponentbattlefieldminustype", "mybattlefieldminusend", "hascntalphaeffect", "myexileplustype", "mygraveyardplusend", "mybattlefieldminus",
+    "bothalldeadcreature", "hascntilluminatoreffect", "battlefieldplustype", "stackplusend", "halfdownlifetotal", "hascntchance", "hascntcosimaeffect",
+    "mygravecardtypesplus", "ohandcountplustype", "opponentbattlefieldplusendminus", "phandcountplustype", "mybattlefieldplusendminus", "hascntcorpse",
+    "halfuptype", "mybattlefieldplus", "hasabilitytwoboastplus", "pbasiclandtypesplus", "psurveiloffsetplus", "myexileplusend", "lastrollresultplustoughnessplusend", "lastrollresultplustype",
+    "myhandplusend", "myhandplustype", "twicecardcountabiltwodngtrgplus", "pnumofcommandcastplus", "mylibraryplustype", "lastrollresultplusmanacostplusend", "opponentbattlefieldplus",
+    "myhandplus", "fullpaidplus", "halfpaidplus", "mygreenpoolcountplus", "kickedplus", "manacostplus", "pginstantsorceryplustype", "graveyardplus", "calculatepartyplus", "pplus",
+    "plushascntperpetualchargeplusend", "pbasiclandtypespluspbasiclandtypesplusend", "pinitiativeplusoinitiativeplusend", "gearplusaurasplusend",
+    "manacostminus", "pminus", "xminus", "lastrollresultminus", "powerminus", "minusphandcountminusend", "opponentbattlefieldminus", "lastrollresultminuslastrollchoiceminusend",
+    "countedamountminus", "countedbamountminus", "mybattlefieldminustype", "opponentbattlefieldminusend", "myhandminustype", "opponenthandminusend", "myhandminus", "mygraveyardminus",
+    "lifetotalminusopponentlifetotalminusend", "opponentlifetotalminuslifetotalminusend", "tminus", "ohandcountminusphandcountminusend", "phandcountminusohandcountminusend", 
+    "opponenthandminustype", "myhandminusend", "phandcountminus", "lastrollresultminusphandcountminusend", "plibrarycountminus", "battlefieldminus", "opponentbattlefielddminus", 
+    "odcountminusodnoncountminusend", "pbasiclandtypesminus", "hascntbstreduce", "hascntartificereffect", "hascntlevel", "hascntdscrd", "hascntcluesac", "hascntcodieeffect", "hascntwind", 
+    "hascntplot", "hascntperpetualtapped", "hascntdamagedealt", "hascntexplore", "hascntbloodline", "hascntcharge", "hascntjudgment", "hascntperpetualdragoncostless", "hascntanycnt",
+    "hascntaim", "hascntritual", "hascntsac", "hascntlif", "hascnttra", "hascntsoul", "hascnthymneffect", "hascntharmony", "hascntinvasionexiled", "hascnttreastoken",
+    "hascntgoblinliar", "hascntminetunnels", "hascntreprieve", "hascntflame", "hascntmarchesaeffect", "hascntadvocateeffect", "hascntmeriekestolen", "hascntexperience",
+    "hascntfirststrike", "hascntmonkeffect", "hascntnineeffect", "hascntincarnation", "hascntperpetualzombie", "hascntperpetualominous", "hascntopaleffect", "hascntpatheffect",
+    "hascntplasmeffect", "hascntpreachereffect", "hascntquest", "hascntecho", "hascntblood", "halfdownhascntblood", "hascntnight", "hascntfade", "hascntsarevokeffect",
+    "hascntlifenoted", "hascntember", "hascntloyalty", "hascntvoid", "plushascntperpetualchargeplusend", "hascnthellkiteeffect", "hascnthellkiteoppoeffect", "hascntpoint",
+    "hascntsynthesiseffect", "hascntfaitheffect", "hascntlore", "hascntdepletedone", "hascntoubliette", "hascntforge", "hascntlostwell", "hascnttrap", "hascntstash",
+    "hascntarena", "hascnthone", "hascntvisionseffect", "hascntinvitation", "hascnteffigyeffect", "findfirsttypeartifact", "findfirsttypepermanent", "oppofindfirsttypecreature", 
+    "oppofindfirsttypenonpermanent", "findfirsttypenonpermanent", "oppofindfirsttypenonland", "findfirsttypeelemental", "findfirsttypeelf", "findfirsttypeland", "oppofindfirsttypeland", 
+    "findfirsttypeplaneswalker", "findfirsttypeenchantment", "hascntoil", "hascntomen", "fivetimesthirdpaid", "thirdupopponentlifetotal", "thirduplifetotal", "thirduptype",
+    "halfupstartinglife", "halfuplifetotal", "halfupopponentlifetotal", "halfsuptartinglife", "halfdownopponentlifetotal", "halfupcurrentturn", "halfdownstartinglife",
+    "diffcardcounttypeland", "diffcardcounttypedemon", "diffcardcounttypegate", "twicethatmuch", "twicefullpaid", "storedtwicefullpaid", "twicecalculateparty", "twicestoredx",
+    "hasmansymw", "hasmansymr", "hasmansymg", "hasmansymu", "hasmansymb", "mypoolsave", "prexx", "opponentdamagecount", "thatmuchcountersoneone", "totcntplaloyalty",
+    "mytargx", "mytargkicked", "thricetype", "thricepower", "plifelost", "poisoncount", "pstormcountplus", "battlefieldplus", "allgravecardtypesplus", "xplus", "targetedpersonshandminus", 
+    "opponenthandminusendmathend", "myhandminusendmathend", "opponenthandminus", "minustype", "mathlifetotalminusopponentlifetotalminusendmathend", "targetedpersonshandminusend",
+    "opponentpoolsave","mathtype", "opponenthandminusendmathend", "myhandminusendmathend", "hascnttower", "thricekicked", "lowest", "myexilepluspginstantsorceryplusend",
+    "hascntdavrieleffect", "hascntjaceeffect", "hascntghostform", "minusoplifelostminusend", "twicepdrewcount", "minusohandcountminusend"
     // Add any additional Wagic constant here
 };
 
 // List of Wagic basic abilities
 std::vector<std::string> basicabilities = {
-    "trample", "forestwalk", "islandwalk", "mountainwalk", "swampwalk", "plainswalk", "flying", "first strike", "double strike", "fear", "flash", "haste", "lifelink",
-    "reach", "shroud", "vigilance", "defender", "banding", "protection from green", "protection from blue", "protection from red", "protection from black", "protection from white",
+    "trample", "forestwalk", "islandwalk", "mountainwalk", "swampwalk", "plainswalk", "flying", "first", "double", "strike", "fear", "flash", "haste", "lifelink",
+    "reach", "shroud", "vigilance", "defender", "banding", "protection", "protection from green", "protection from blue", "protection from red", "protection from black", "protection from white",
     "unblockable", "wither", "persist", "retrace", "exalted", "nofizzle", "shadow", "reachshadow", "foresthome", "islandhome", "mountainhome", "swamphome", "plainshome",
     "cloud", "cantattack", "mustattack", "cantblock", "doesnotuntap", "opponentshroud", "indestructible", "intimidate", "deathtouch", "horsemanship", "cantregen", "oneblocker",
     "infect", "poisontoxic", "poisontwotoxic", "poisonthreetoxic", "phantom", "wilting", "vigor", "changeling", "absorb", "treason", "unearth", "cantlose", "cantlifelose", "cantmilllose",
-    "snowlandwalk", "nonbasiclandwalk", "strong", "storm", "phasing", "split second", "weak", "affinityartifacts", "affinityplains", "affinityforests", "affinityislands", "affinitymountains",
+    "snowlandwalk", "nonbasiclandwalk", "strong", "storm", "phasing", "split", "second", "weak", "affinityartifacts", "affinityplains", "affinityforests", "affinityislands", "affinitymountains",
     "affinityswamps", "affinitygreencreatures", "cantwin", "nomaxhand", "leyline", "playershroud", "controllershroud", "sunburst", "flanking", "exiledeath", "legendarylandwalk", "desertlandwalk",
     "snowforestlandwalk", "snowplainslandwalk", "snowmountainlandwalk", "snowislandlandwalk", "snowswamplandwalk", "canattack", "hydra", "undying", "poisonshroud", "noactivatedability",
     "notapability", "nomanaability", "onlymanaability", "poisondamager", "soulbond", "lure", "nolegend", "canplayfromgraveyard", "tokenizer", "mygraveexiler", "oppgraveexiler", "librarydeath",
@@ -203,7 +257,8 @@ std::vector<std::string> basicabilities = {
     "perpetualdeathtouch", "noncombatvigor", "nomovetrigger", "wascommander", "showopponenthand", "showcontrollerhand", "hasreplicate", "isprey", "hasdisturb", "daybound", "nightbound", "decayed",
     "hasstrive", "isconspiracy", "hasaftermath", "noentertrg", "nodietrg", "training", "energyshroud", "expshroud", "countershroud", "nonight", "nodamageremoved", "backgroundpartner", "bottomlibrarydeath",
     "noloyaltydamage", "nodefensedamage", "affinityallcreatures", "affinitycontrollercreatures", "affinityopponentcreatures", "affinityalldeadcreatures", "affinityparty", "affinityenchantments",
-    "affinitybasiclandtypes", "affinitytwobasiclandtypes", "affinitygravecreatures", "affinityattackingcreatures", "affinitygraveinstsorc", "canloyaltytwice", "attached", "fresh"
+    "affinitybasiclandtypes", "affinitytwobasiclandtypes", "affinitygravecreatures", "affinityattackingcreatures", "affinitygraveinstsorc", "canloyaltytwice", "attached", "fresh", 
+    "snowplainswalk", "snowislandwalk", "snowswampwalk", "snowmountainwalk", "snowforestwalk", "desertwalk", "renown"
     // Add any additional Wagic basic ability here
 };
 
@@ -218,7 +273,7 @@ std::vector<std::string> types = {
     "coward", "crab", "creature", "cridhe", "crocodile", "curse", "cyborg", "cyclops", "dack", "dakkon", "daretti", "dauthi", "davriel", "deer",
     "demigod", "demon", "desert", "designer", "devil", "dihada", "dinosaur", "djinn", "dog", "dominaria", "domri", "donkey", "dovin", "dragon",
     "drake", "dreadnought", "drone", "druid", "dryad", "duck", "dungeon", "dwarf", "eaturecray", "echoir", "efreet", "egg", "elder", "eldraine",
-    "eldrazi", "elemental", "elephant", "elf", "elk", "ellywick", "elminster", "elspeth", "elves", "emblem", "enchant", "enchantment", "equilor",
+    "eldrazi", "elemental", "elephant", "elf", "elk", "ellywick", "elminster", "elspeth", "elves", "enchant", "enchantment", "equilor",
     "equipment", "ergamon", "estrid", "etiquette", "eye", "fabacin", "faerie", "ferret", "fiora", "fish", "flagbearer", "food", "forest", "fox",
     "fractal", "freyalise", "frog", "fungus", "gamer", "gargantikar", "gargoyle", "garruk", "gate", "giant", "gideon", "gith", "gnoll", "gnome",
     "goat", "gobakhan", "goblin", "god", "golem", "gorgon", "grandchild", "gremlin", "griffin", "grist", "gus", "hag", "halfling", "harpy", "hatificer",
@@ -243,7 +298,16 @@ std::vector<std::string> types = {
     "ugin", "ulgrotha", "unicorn", "urza", "valla", "vanguard", "vampire", "vampyre", "vedalken", "vehicle", "venser", "viashino", "villain", "vivien", "volver",
     "vraska", "vryn", "waiter", "wall", "walrus", "warlock", "warrior", "weird", "werewolf", "whale", "wildfire", "will", "windgrace", "wizard", "wolf",
     "wolverine", "wombat", "worker", "world", "worm", "wraith", "wrenn", "wrestler", "wurm", "xenagos", "xerex", "yanggu", "yanling", "yeti", "zariel",
-    "zendikar", "zhalfir", "zombie", "zubera", "creature", "instant"
+    "zendikar", "zhalfir", "zombie", "zubera", "creature", "instant", "tobecast", "sur", "tomb", "of", "annihilation", "agadeem", "the", "undercrypt",
+    "tobereturn", "marauder", "airlift", "chaplain", "valiant", "protector", "akoum", "teeth", "watchdog", "alpine", "watchdog", "igneous", "cur", 
+    "whispering", "raven", "ancestral", "anger", "day", "night", "amplifire", "destiny", "marauders", "anthem", "treasureartifacttoken", "inkling",
+    "disenchant", "terror", "braingeyser", "shivan", "regrowth", "lotus", "br", "monstrous","Arni", "Brokenbrow", "bloodletting", "phandelver", "affected",
+    "gathering", "goliath", "crossbreed", " labs", "watermark", "ru", "genesis", "mage", "brambleweft", "behemoth", "gladewalker", "ritualist", "jiang",
+    "halfdowntype", "halfdownx", "halfupx", "halfuppower", "twicemyname", "twicex", "twicekicked", "twiceothertype", "twicepbasiclandtypes", "m",
+    "control", "two", "or", "more", "vampires", "gr", "rb", "peer", "through", "depths", "mists", "kgoblin", "kfox", "kmoonfolk", "krat", "ksnake",
+    "a", "spell", "aether", "burst", "kjeldoran", "war", "cry", "one", "kind", "saclands", "less", "creatures", "artifacts", "enchantments", "lands",
+    "t", "r", "b", "u", "d", "s", "w", "g", "l", "x", "e", "c", "p", "gw", "rw", "wu", "gu", "bg", "wb", "rg", "h", "i", "ub", "q", "ur", "xx", "n",
+    "color", "kindle", "scion", "skyshipped", "splinter", "stangg", "twin", "sunweb"
     // Add any additional Wagic types here
 };
 
@@ -325,7 +389,7 @@ static LRESULT handleScnModified(SCNotification* notification) {
 
         std::string lineText = editor.GetLine(currentLine);
         int index = lineText.find("=");
-        if ((index < 0) || !(lineText.find("text=") != 0 && lineText.find("name=") != 0 && lineText.find("power=") != 0 && lineText.find("toughness=") != 0 &&
+        if ((index < 0) || !(lineText.find("text=") != 0 && lineText.find("partner=") != 0 && lineText.find("backside=") != 0 && lineText.find("name=") != 0 && lineText.find("power=") != 0 && lineText.find("toughness=") != 0 &&
             lineText.find("type=") != 0 && lineText.find("subtype=") != 0 && lineText.find("grade=") != 0 && lineText.find("#") != 0))
             return -1;
 
@@ -357,12 +421,6 @@ static LRESULT handleScnModified(SCNotification* notification) {
             std::vector<std::string> matchingSuggestions;
 
             for (const std::string& suggestion : allVectors) {
-                if (suggestion.compare(0, currentWord.length(), currentWord) == 0) {
-                    matchingSuggestions.push_back(suggestion);
-                }
-            }
-
-            for (const std::string& suggestion : types) {
                 if (suggestion.compare(0, currentWord.length(), currentWord) == 0) {
                     matchingSuggestions.push_back(suggestion);
                 }
@@ -433,62 +491,146 @@ static void CheckWagicLineSyntax(int i) {
     }
     // Check if it's a row to control
     if (lineText.find("text=") != 0 && lineText.find("name=") != 0 && lineText.find("power=") != 0 && lineText.find("toughness=") != 0 &&
-        lineText.find("type=") != 0 && lineText.find("subtype=") != 0 && lineText.find("grade=") != 0) {
+        lineText.find("type=") != 0 && lineText.find("subtype=") != 0 && lineText.find("grade=") != 0 && lineText.find("backside=") != 0 && 
+        lineText.find("partner=") != 0) {
         // Remove the row prefix
         int offset = lineText.find("=");
         if (offset < 0)
             return;
         lineText = lineText.substr(offset);
-        // Find the all the possibile tokens in the current row
-        for (const std::string& elem : allVectors) {
-            size_t pos = 0;
-            std::string word = elem;
-            std::transform(word.begin(), word.end(), word.begin(),
-                [](unsigned char c) { return std::tolower(c); });
-            while ((pos = lineText.find(word, pos)) != std::string::npos) {
-                if (!containsWordBetween("name(", ")", lineText, word, pos)) {
-                    int startPos = editor.PositionFromLine(i) + pos + offset;
-                    int endPos = startPos + word.length();
-                    if (endPos > editor.GetLineEndPosition(i))
-                        endPos = editor.GetLineEndPosition(i);
-                    // Apply the correct color
-                    if (std::find(zones.begin(), zones.end(), word) != zones.end())
-                    {
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_COMMENTDOC);
-                    } 
-                    else if (std::find(constants.begin(), constants.end(), word) != constants.end())
-                    {
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_PREPROCESSOR);
-                    }
-                    else if (std::find(basicabilities.begin(), basicabilities.end(), word) != basicabilities.end())
-                    {
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_PREPROCESSOR);
-                    }
-                    else if (std::find(keywords.begin(), keywords.end(), word) != keywords.end())
-                    {
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_WORD);
-                    }
-                    else if (std::find(triggers.begin(), triggers.end(), word) != triggers.end())
-                    {
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_TASKMARKER);
-                    }
-                    else
-                    {
-                        std::transform(word.begin(), word.end(), word.begin(),
-                            [](unsigned char c) { return std::toupper(c); });
-                        if (std::find(macros.begin(), macros.end(), word) != macros.end())
-                        {
-                            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_HASHQUOTEDSTRING);
+
+        size_t pos = 0;
+        while (pos != std::string::npos && pos < lineText.length()) {
+            while (pos < lineText.length() && lineText[pos] != '_' && lineText[pos] != '@' && (lineText[pos] < 97 || lineText[pos] > 122)) {
+                if (pos < lineText.length())
+                    pos++;
+            }
+            int startPos = pos;
+            if (pos < lineText.length() && lineText[pos] == '@')
+                pos++;
+            if (pos < lineText.length() && lineText[pos] == '_')
+                pos++;
+            if (pos < lineText.length() && lineText[pos] == '_')
+                pos++;
+            while (pos < lineText.length() && (lineText[pos] >= 97 && lineText[pos] <= 122)) {
+                if (pos < lineText.length())
+                    pos++;
+            }
+            if (pos < lineText.length() && lineText[pos] == '@')
+                pos++;
+            if (pos < lineText.length() && lineText[startPos] == '_' && lineText[pos] == '_')
+                pos++;
+            if (pos < lineText.length() && lineText[startPos] == '_' && lineText[pos] == '_')
+                pos++;
+            int endPos = pos;
+            std::string word = lineText.substr(startPos, endPos - startPos);
+            if (!containsWordBetween("name(", ")", lineText, word, startPos) && !containsWordBetween("counter(", ")", lineText, word, startPos) &&
+                !containsWordBetween("counter{", "}", lineText, word, startPos) && !containsWordBetween("counters(", ")", lineText, word, startPos) &&
+                !containsWordBetween("c(", ")", lineText, word, startPos)){
+                startPos = editor.PositionFromLine(i) + startPos + offset;
+                endPos = startPos + word.length();
+                if (endPos > editor.GetLineEndPosition(i))
+                    endPos = editor.GetLineEndPosition(i);
+                // Apply the correct color
+                if (std::find(keywords.begin(), keywords.end(), word) != keywords.end())
+                {
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_WORD);
+                }
+                else if (std::find(zones.begin(), zones.end(), word) != zones.end())
+                {
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_COMMENTDOC);
+                }
+                else if (std::find(constants.begin(), constants.end(), word) != constants.end())
+                {
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_PREPROCESSOR);
+                }
+                else if (std::find(basicabilities.begin(), basicabilities.end(), word) != basicabilities.end())
+                {
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_PREPROCESSOR);
+                }
+                else if (std::find(types.begin(), types.end(), word) != types.end())
+                {
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_OPERATOR);
+                }
+                else if(!word.empty() && word.find('@') == std::string::npos && word.find('_') == std::string::npos  &&
+                    !containsWordBetween("all(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("target(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("token(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("create(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("cards(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("counteradded(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("flip(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("doubleside(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("named!", "!", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("sacrifice(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("s(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("d(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("meldfrom(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("meld(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("except(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("from(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("foreach(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("lord(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("thisturn(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("type(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)))
+                {
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos , 0x1f);
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_ESCAPESEQUENCE);
+                    if (debug && !(std::find(errorList.begin(), errorList.end(), word) != errorList.end())) {
+                        errorList.push_back(word);
+                        std::ofstream my_file;
+                        my_file.open("\errors.txt", std::ios_base::app);
+                        if (my_file) {
+                            word = "\"" + word + "\"" + "\n";
+                            my_file << "line:" << i << word;
+                            my_file.close();
                         }
                     }
                 }
-                pos += word.length();
+            }
+        }
+        // Find the all the possibile composite triggers in the current row
+        for (const std::string& trigger : triggers) {
+            int lastfound = 0;
+            while ((lastfound = lineText.find(trigger, lastfound)) != std::string::npos) {
+                int startPos = editor.PositionFromLine(i) + lastfound + offset;
+                int endPos = startPos + trigger.length();
+                if (endPos > editor.GetLineEndPosition(i))
+                    endPos = editor.GetLineEndPosition(i);
+                // Apply the correct color
+                if (std::find(triggers.begin(), triggers.end(), trigger) != triggers.end())
+                {
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_TASKMARKER);
+                }
+                lastfound += trigger.length();
+                break;
+            }
+        }
+        // Find the all the possibile composite macros in the current row
+        std::transform(lineText.begin(), lineText.end(), lineText.begin(),
+            [](unsigned char c) { return std::toupper(c); });
+        for (const std::string& macro : macros) {
+            int lastfound = 0;
+            while ((lastfound = lineText.find(macro, lastfound)) != std::string::npos) {
+                int startPos = editor.PositionFromLine(i) + lastfound + offset;
+                int endPos = startPos + macro.length();
+                if (endPos > editor.GetLineEndPosition(i))
+                    endPos = editor.GetLineEndPosition(i);
+                // Apply the correct color
+                if (std::find(macros.begin(), macros.end(), macro) != macros.end())
+                {
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_HASHQUOTEDSTRING);
+                }
+                lastfound += macro.length();
+                pos = lastfound;
+                break;
             }
         }
         // Check the unbalanced parenthesis
@@ -632,6 +774,7 @@ static void SetCurrentEditor() {
         allVectors.insert(allVectors.end(), constants.begin(), constants.end());
         allVectors.insert(allVectors.end(), basicabilities.begin(), basicabilities.end());
         allVectors.insert(allVectors.end(), keywords.begin(), keywords.end());
+        allVectors.insert(allVectors.end(), types.begin(), types.end());
         allVectors.insert(allVectors.end(), triggers.begin(), triggers.end());
         allVectors.insert(allVectors.end(), macros.begin(), macros.end());
     }
