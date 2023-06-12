@@ -49,7 +49,7 @@ static ScintillaEditor editor;
 static bool active = false;
 
 // Flag for debug and logger
-static bool debug = false;
+static bool debug = true;
 static std::ofstream logger;
 
 // Forward declaration of menu callbacks
@@ -78,7 +78,7 @@ std::vector<std::string> keywords = {
     "becomesmonarchfoeof", "becomesmonarchof", "belong", "bestow", "bestowrule", "blockcost", "blockcostrule", "blockrule", "bloodthirst", 
     "boasted", "bonusrule", "bottomoflibrary", "bstw", "bury", "bushido", "buyback", "buybackrule", "cantargetcard", "cantbeblockedby", 
     "cantbeblockerof", "cantbetargetof", "canuntap", "card", "cards", "cascade", "castcard", "restricted", "casted", "cdaactive", "changecost", 
-    "charge", "checkex", "chooseaname", "clone", "coinflipped", "coloringest", "combatphases", "combatends", "colors", "combatspiritlink", 
+    "checkex", "chooseaname", "clone", "coinflipped", "coloringest", "combatphases", "combatends", "colors", "combatspiritlink", 
     "combattriggerrule", "commandzonecast", "compare", "completedungeon", "conjure", "connect", "connectrule", "continue", "controller", "copied", 
     "copiedacard", "copy", "costx", "count", "countb", "counter", "countermod", "counterremoved", "countershroud", "countersoneone",
     "countertrack", "coven", "create", "cumulativeupcost", "cycled", "damage", "deadcreart", "deadpermanent", "deathtouchrule", "defense", "delayed", 
@@ -119,7 +119,7 @@ std::vector<std::string> keywords = {
     "cantblocktarget", "endstep", "before", "attackers", "during", "dredge", "cleanup", "manacostlifegain", "opponentblockersonly", "powerlifegain", "cumulativeupcostmulti", 
     "sourcenottapped", "oneonecountersstrike", "powercountersoneone", "powerlifeloss", "manacoststrike", "chargelifegain", "myupkeep", "untaponly", "toughnesstrike", "chargedeplete", 
     "chargestrike", "manacostpumppow", "didcombatdamagetofoe", "manacostpumpboth", "manacostpumptough", "powerdraw", "colorspumpboth", "postbattle", "nonwall", "value", "twist", 
-    "emblem", "combatdamage"
+    "emblem", "combatdamage", "convoke", "crew", "improvise", "delve", "emerge"
     // Add any additional Wagic keyword here
 };
 
@@ -317,7 +317,8 @@ std::vector<std::string> types = {
     "control", "two", "or", "more", "vampires", "gr", "rb", "peer", "through", "depths", "mists", "kgoblin", "kfox", "kmoonfolk", "krat", "ksnake",
     "a", "spell", "aether", "burst", "kjeldoran", "war", "cry", "one", "kind", "saclands", "less", "creatures", "artifacts", "enchantments", "lands",
     "t", "r", "b", "u", "d", "s", "w", "g", "l", "x", "e", "c", "p", "gw", "rw", "wu", "gu", "bg", "wb", "rg", "h", "i", "ub", "q", "ur", "xx", "n",
-    "color", "kindle", "scion", "skyshipped", "splinter", "stangg", "twin", "sunweb"
+    "color", "kindle", "scion", "skyshipped", "splinter", "stangg", "twin", "sunweb", "visitation", "vecna", "mirror", "mad", "phantasm", "cost",
+    "word", "autostack"
     // Add any additional Wagic types here
 };
 
@@ -500,7 +501,7 @@ static void CheckWagicLineSyntax(int i) {
         [](unsigned char c) { return std::tolower(c); });
 
     // Check if it's a comment row
-    if (lineText[0] == '#' && lineText.find("auto_define") == std::string::npos) {
+    if (lineText[0] == '#' && lineText.find("#auto_define") == std::string::npos) {
         ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, editor.PositionFromLine(i), 0x1f);
         ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, editor.GetLineEndPosition(i) - editor.PositionFromLine(i), SCE_C_COMMENT);
         return;
@@ -560,9 +561,7 @@ static void CheckWagicLineSyntax(int i) {
                 pos++;
             int endPos = pos;
             std::string word = lineText.substr(startPos, endPos - startPos);
-            if (!containsWordBetween("name(", ")", lineText, word, startPos) && !containsWordBetween("counter(", ")", lineText, word, startPos) &&
-                !containsWordBetween("counter{", "}", lineText, word, startPos) && !containsWordBetween("counters(", ")", lineText, word, startPos) &&
-                !containsWordBetween("c(", ")", lineText, word, startPos)){
+            if (!containsWordBetween("name(", ")", lineText, word, startPos)){
                 startPos = editor.PositionFromLine(i) + startPos + offset;
                 endPos = startPos + word.length();
                 if (endPos > editor.GetLineEndPosition(i))
@@ -606,11 +605,16 @@ static void CheckWagicLineSyntax(int i) {
                     !containsWordBetween("create(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
                     !containsWordBetween("cards(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
                     !containsWordBetween("counteradded(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("counter{", "}", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("counter(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("counters(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
                     !containsWordBetween("flip(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
                     !containsWordBetween("doubleside(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
                     !containsWordBetween("named!", "!", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
                     !containsWordBetween("sacrifice(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
                     !containsWordBetween("s(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("e(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
+                    !containsWordBetween("c(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
                     !containsWordBetween("d(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
                     !containsWordBetween("meldfrom(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
                     !containsWordBetween("meld(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
