@@ -49,7 +49,7 @@ static ScintillaEditor editor;
 static bool active = false;
 
 // Flag for debug and logger
-static bool debug = true;
+static bool debug = false;
 static std::ofstream logger;
 
 // Forward declaration of menu callbacks
