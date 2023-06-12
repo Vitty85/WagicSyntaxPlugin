@@ -48,9 +48,9 @@ static ScintillaEditor editor;
 // The plugin activation control flag
 static bool active = false;
 
-// List of wrong words found during analysis
-std::vector<std::string> errorList;
-static bool debug = false;
+// Flag for debug and logger
+static bool debug = true;
+static std::ofstream logger;
 
 // Forward declaration of menu callbacks
 static void SetStyles();
@@ -116,7 +116,7 @@ std::vector<std::string> keywords = {
     "cantblocktarget", "endstep", "before", "attackers", "during", "dredge", "cleanup", "manacostlifegain", "opponentblockersonly", "powerlifegain", "cumulativeupcostmulti", 
     "sourcenottapped", "oneonecountersstrike", "powercountersoneone", "powerlifeloss", "manacoststrike", "chargelifegain", "myupkeep", "untaponly",
     "toughnesstrike", "chargedeplete", "chargestrike", "manacostpumppow", "didcombatdamagetofoe", "manacostpumpboth", "manacostpumptough", "powerdraw", 
-    "colorspumpboth", "postbattle", "nonwall", "value", "twist", "emblem"
+    "colorspumpboth", "postbattle", "nonwall", "value", "twist", "emblem", "combatdamage"
     // Add any additional Wagic keyword here
 };
 
@@ -357,6 +357,13 @@ static bool containsWordBetween(const std::string openingTag, const std::string 
 
 static void SetStyles() {
     active = true;
+
+    // Init the logger
+    if (debug && (!logger || !logger.is_open())) {
+        remove("log.txt");
+        logger.open("log.txt", std::ios_base::app);
+    }
+
     // Set the default style
     ::SendMessage(nppData._scintillaMainHandle, SCI_STYLECLEARALL, 0, 0);
     ::SendMessage(nppData._scintillaMainHandle, SCI_STYLESETFORE, STYLE_DEFAULT, RGB(0, 0, 0));
@@ -457,6 +464,10 @@ static void disablePlugin() {
     int endpos = editor.GetLength();
     ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, 0, 0x1f);
     ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endpos, SCE_C_OPERATOR);
+    if (debug && logger && logger.is_open()) {
+        logger.close();
+        remove("log.txt");
+    }
 }
 
 static void CheckWagicCurrentLineSyntax() {
@@ -479,7 +490,7 @@ static void CheckWagicLineSyntax(int i) {
         [](unsigned char c) { return std::tolower(c); });
 
     // Check if it's a comment row
-    if (lineText[0] == '#') {
+    if (lineText[0] == '#' && lineText.find("auto_define") == std::string::npos) {
         ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, editor.PositionFromLine(i), 0x1f);
         ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, editor.GetLineEndPosition(i) - editor.PositionFromLine(i), SCE_C_COMMENT);
         return;
@@ -494,18 +505,33 @@ static void CheckWagicLineSyntax(int i) {
         lineText.find("type=") != 0 && lineText.find("subtype=") != 0 && lineText.find("grade=") != 0 && lineText.find("backside=") != 0 && 
         lineText.find("partner=") != 0) {
         // Remove the row prefix
-        int offset = lineText.find("=");
-        if (offset < 0)
-            return;
+        int offset = lineText.find("auto_define");
+        if (offset < 0) {
+            offset = offset = lineText.find("=");
+            if (offset < 0)
+                return;
+        }
         lineText = lineText.substr(offset);
 
         size_t pos = 0;
+        bool triggerRow = false;
+        bool macroRow = false;
         while (pos != std::string::npos && pos < lineText.length()) {
             while (pos < lineText.length() && lineText[pos] != '_' && lineText[pos] != '@' && (lineText[pos] < 97 || lineText[pos] > 122)) {
                 if (pos < lineText.length())
                     pos++;
             }
             int startPos = pos;
+            bool triggerWord = false;
+            bool macroWord = false;
+            if (lineText[startPos] == '@') {
+                triggerRow = true;
+                triggerWord = true;
+            }
+            else if (lineText[startPos] == '_') {
+                macroRow = true;
+                macroWord = true;
+            }
             if (pos < lineText.length() && lineText[pos] == '@')
                 pos++;
             if (pos < lineText.length() && lineText[pos] == '_')
@@ -536,6 +562,11 @@ static void CheckWagicLineSyntax(int i) {
                 {
                     ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
                     ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_WORD);
+                    if (word == "reveal" && (endPos - offset - editor.PositionFromLine(i) < lineText.length()) && 
+                        lineText[endPos - offset - editor.PositionFromLine(i)] != ':') {
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_COMMENTDOC);
+                    }
                 }
                 else if (std::find(zones.begin(), zones.end(), word) != zones.end())
                 {
@@ -557,7 +588,8 @@ static void CheckWagicLineSyntax(int i) {
                     ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
                     ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_OPERATOR);
                 }
-                else if(!word.empty() && word.find('@') == std::string::npos && word.find('_') == std::string::npos  &&
+                else if(!word.empty() && !triggerWord  && !macroWord && 
+                    ((startPos - offset - editor.PositionFromLine(i)) > 0 && lineText[startPos - offset - editor.PositionFromLine(i) - 1] != '_') &&
                     !containsWordBetween("all(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
                     !containsWordBetween("target(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
                     !containsWordBetween("token(", ")", lineText, word, startPos - offset - editor.PositionFromLine(i)) &&
@@ -581,56 +613,55 @@ static void CheckWagicLineSyntax(int i) {
                 {
                     ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos , 0x1f);
                     ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_ESCAPESEQUENCE);
-                    if (debug && !(std::find(errorList.begin(), errorList.end(), word) != errorList.end())) {
-                        errorList.push_back(word);
-                        std::ofstream my_file;
-                        my_file.open("\errors.txt", std::ios_base::app);
-                        if (my_file) {
-                            word = "\"" + word + "\"" + "\n";
-                            my_file << "line:" << i << word;
-                            my_file.close();
-                        }
+                    if (debug && logger && logger.is_open()) {
+                        word = "\"" + word + "\"" + "\n";
+                        logger << "{ERR} - " << "unknown word in line (" << i << "): " << word;
+                        logger.flush();
                     }
                 }
             }
         }
-        // Find the all the possibile composite triggers in the current row
-        for (const std::string& trigger : triggers) {
-            int lastfound = 0;
-            while ((lastfound = lineText.find(trigger, lastfound)) != std::string::npos) {
-                int startPos = editor.PositionFromLine(i) + lastfound + offset;
-                int endPos = startPos + trigger.length();
-                if (endPos > editor.GetLineEndPosition(i))
-                    endPos = editor.GetLineEndPosition(i);
-                // Apply the correct color
-                if (std::find(triggers.begin(), triggers.end(), trigger) != triggers.end())
-                {
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_TASKMARKER);
+        if (triggerRow) {
+            // Find the all the possibile composite triggers in the current row
+            for (const std::string& trigger : triggers) {
+                int lastfound = 0;
+                while ((lastfound = lineText.find(trigger, lastfound)) != std::string::npos) {
+                    int startPos = editor.PositionFromLine(i) + lastfound + offset;
+                    int endPos = startPos + trigger.length();
+                    if (endPos > editor.GetLineEndPosition(i))
+                        endPos = editor.GetLineEndPosition(i);
+                    // Apply the correct color
+                    if (std::find(triggers.begin(), triggers.end(), trigger) != triggers.end())
+                    {
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_TASKMARKER);
+                    }
+                    lastfound += trigger.length();
+                    break;
                 }
-                lastfound += trigger.length();
-                break;
             }
         }
-        // Find the all the possibile composite macros in the current row
-        std::transform(lineText.begin(), lineText.end(), lineText.begin(),
-            [](unsigned char c) { return std::toupper(c); });
-        for (const std::string& macro : macros) {
-            int lastfound = 0;
-            while ((lastfound = lineText.find(macro, lastfound)) != std::string::npos) {
-                int startPos = editor.PositionFromLine(i) + lastfound + offset;
-                int endPos = startPos + macro.length();
-                if (endPos > editor.GetLineEndPosition(i))
-                    endPos = editor.GetLineEndPosition(i);
-                // Apply the correct color
-                if (std::find(macros.begin(), macros.end(), macro) != macros.end())
-                {
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_HASHQUOTEDSTRING);
+        if (macroRow) {
+            // Find the all the possibile composite macros in the current row
+            std::transform(lineText.begin(), lineText.end(), lineText.begin(),
+                [](unsigned char c) { return std::toupper(c); });
+            for (const std::string& macro : macros) {
+                int lastfound = 0;
+                while ((lastfound = lineText.find(macro, lastfound)) != std::string::npos) {
+                    int startPos = editor.PositionFromLine(i) + lastfound + offset;
+                    int endPos = startPos + macro.length();
+                    if (endPos > editor.GetLineEndPosition(i))
+                        endPos = editor.GetLineEndPosition(i);
+                    // Apply the correct color
+                    if (std::find(macros.begin(), macros.end(), macro) != macros.end())
+                    {
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_HASHQUOTEDSTRING);
+                    }
+                    lastfound += macro.length();
+                    pos = lastfound;
+                    break;
                 }
-                lastfound += macro.length();
-                pos = lastfound;
-                break;
             }
         }
         // Check the unbalanced parenthesis
@@ -767,6 +798,12 @@ static void SetCurrentEditor() {
     int which = -1;
     SendMessage(nppData._nppHandle, NPPM_GETCURRENTSCINTILLA, SCI_UNUSED, (LPARAM)&which);
     editor = (which == 0) ? editor1 : editor2;
+
+    // Init the logger
+    if (debug && (!logger || !logger.is_open())) {
+        remove("log.txt");
+        logger.open("log.txt", std::ios_base::app);
+    }
 
     // Initialize the full vector starting from the single ones.
     if (allVectors.empty()) {
