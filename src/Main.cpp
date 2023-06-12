@@ -197,7 +197,7 @@ std::vector<std::string> constants = {
     "oppototalmana", "oppsametypecreatures", "orzhov", "ostartinglife", "ostormcount", "osurveiloffset", "otherconvertedcost", "otherpower", "othertoughness", "othertype", "oyidarocount", 
     "palldead", "pancientooze", "pattackedcount", "pbasiclandtypes", "pcoven", "pcycledcount", "pdauntless", "pdcount", "pdevotionoffset", "pdiffinitlife", "pdnoncount", "pdomain", 
     "pdrewcount", "pdungeoncompleted", "penergy", "permanent", "pexperience", "pgbzombie", "pginstantsorcery", "pgmanainstantsorcery", "phalfinitlife", "phandcount", "pinitiative", 
-    "pinstsorcount", "plandb", "plandc", "plandg", "plandr", "plandu", "plandw", "plastshlturn", "plibrarycount", "plus", "plusend", "pmonarch", "pnumcreswp", "pnumofcommandcast", 
+    "pinstsorcount", "plandb", "plandc", "plandg", "plandr", "plandu", "plandw", "plastshlturn", "plibrarycount", "plusend", "pmonarch", "pnumcreswp", "pnumofcommandcast", 
     "pnumofidentitycols", "power", "powertotalinplay", "prex", "prodmana", "pstormcount", "psurveiloffset", "pwr", "pwrtotalinplay", "pwrtotatt", "pwrtotblo", "pyidarocount", "rakdos", 
     "restriction{", "revealedmana", "revealedp", "revealedt", "sametypecreatures", "scryedcards", "selesnya", "simic", "snowdiffmana", "srclastdiefaces", "srclastrollchoice",
     "srclastrollresult", "startinglife", "startingplayer", "stored", "sunburst", "targetedcurses", "thatmuch", "thirddown", "thirdpaid", "thirdup", "thrice", "ths:", "thstotalinplay", 
@@ -240,7 +240,7 @@ std::vector<std::string> constants = {
     "mytargx", "mytargkicked", "thricetype", "thricepower", "plifelost", "poisoncount", "pstormcountplus", "battlefieldplus", "allgravecardtypesplus", "xplus", "targetedpersonshandminus", 
     "opponenthandminusendmathend", "myhandminusendmathend", "opponenthandminus", "minustype", "mathlifetotalminusopponentlifetotalminusendmathend", "targetedpersonshandminusend",
     "opponentpoolsave","mathtype", "opponenthandminusendmathend", "myhandminusendmathend", "hascnttower", "thricekicked", "lowest", "myexilepluspginstantsorceryplusend",
-    "hascntdavrieleffect", "hascntjaceeffect", "hascntghostform", "minusoplifelostminusend", "twicepdrewcount", "minusohandcountminusend"
+    "hascntdavrieleffect", "hascntjaceeffect", "hascntghostform", "minusoplifelostminusend", "twicepdrewcount", "minusohandcountminusend", "manacostminus4minusend"
     // Add any additional Wagic constant here
 };
 
@@ -355,7 +355,7 @@ static bool containsWordBetween(const std::string openingTag, const std::string 
 
         // Find the word in the substring
         size_t wordPos = nameValue.find(wordToCheck);
-        if (wordPos != std::string::npos && pos < (closingPos + delta))
+        if (wordPos != std::string::npos && pos > openingPos && pos < (closingPos + delta))
             return true;
 
         // Try to seek row to search on next iteration
