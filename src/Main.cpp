@@ -483,7 +483,7 @@ static LRESULT handleScnModified(SCNotification* notification) {
                 }
             }
             if (!matchingSuggestions.empty()) {
-                // Merge all the suggetsions in a unique string with '\n' sperator
+                // Merge all the suggestions in a sorted unique string with '\n' sperator
                 std::sort(matchingSuggestions.begin(), matchingSuggestions.end());
                 std::string suggestionsString;
                 for (const std::string& suggestion : matchingSuggestions) {
