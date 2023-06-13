@@ -432,9 +432,7 @@ static void SetStyles() {
 
 static LRESULT handleScnModified(SCNotification* notification) {
     if (notification->modificationType & (SC_MOD_INSERTTEXT)) {
-        if (notification->text != NULL && (!strcmp(notification->text, "\n") || !strcmp(notification->text, "\t"))) {
-            return -1;
-        }
+        // Get the info about the current line and position
         int currentPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETCURRENTPOS, 0, 0);
         int currentLine = ::SendMessage(nppData._scintillaMainHandle, SCI_LINEFROMPOSITION, currentPosition, 0);
         int lineStartPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_POSITIONFROMLINE, currentLine, 0);
@@ -455,7 +453,6 @@ static LRESULT handleScnModified(SCNotification* notification) {
             if (index < 0)
                 return -1;
         }
-        editor.AutoCSetAutoHide(false);
         if (wordStartPosition != wordEndPosition) {
             std::string currentWord = editor.GetText().substr(wordStartPosition, wordEndPosition);
             currentWord = currentWord.substr(0, currentWord.find_first_of('\r'));
@@ -487,16 +484,18 @@ static LRESULT handleScnModified(SCNotification* notification) {
             }
             if (!matchingSuggestions.empty()) {
                 // Merge all the suggetsions in a unique string with '\n' sperator
+                std::sort(matchingSuggestions.begin(), matchingSuggestions.end());
                 std::string suggestionsString;
                 for (const std::string& suggestion : matchingSuggestions) {
                     suggestionsString += suggestion + '\n';
                 }
-
                 // Set the suggestion menu of Notepad++
                 editor.AutoCCancel();
                 editor.AutoCShow(currentWord.length(), suggestionsString);
                 editor.AutoCSetSeparator('\n');
-                editor.AutoCSetAutoHide(true);
+                editor.AutoCCancel();
+                editor.AutoCShow(currentWord.length(), suggestionsString);
+                editor.AutoCSetSeparator('\n');
             }
             SetStyles();
             CheckWagicLineSyntax(currentLine);
