@@ -23,15 +23,18 @@
 #include "menuCmdID.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
+
 #include <Windows.h>
 #include <vector>
 #include <string>
 #include <algorithm>
 #include <stack>
 #include <map>
-
 #include <iostream>
 #include <fstream>
+#include <locale>
+#include <codecvt>
+#include <thread>
 
 // The Scintilla Plugin Windows Proc
 WNDPROC OldPluginWndProc = nullptr;
@@ -46,17 +49,17 @@ static ScintillaEditor editor2;
 // References the current editor
 static ScintillaEditor editor;
 // The plugin activation control flag
-static bool active = false;
-
-// Flag for debug and logger
-static bool debug = false;
+static bool active = true;
+// The stream for logger instance
 static std::ofstream logger;
 
 // Forward declaration of menu callbacks
 static void SetStyles();
 static void CheckWagicAllLinesSyntax();
 static void CheckWagicCurrentLineSyntax();
+static void CheckWagicVisibleLinesSyntax();
 static void CheckWagicLineSyntax(int i);
+static void CheckUnbalancedParenthesys(int line, int offset);
 static void disablePlugin();
 static void showAbout();
 
@@ -64,7 +67,7 @@ static void showAbout();
 static FuncItem menuItems[] = {
     // name, function, 0, is_checked, shortcut
     { L"Disable Online Syntax Check", disablePlugin, 0, false, nullptr },
-    { L"Enable and Perform Current Line Syntax Check", CheckWagicCurrentLineSyntax, 0, false, nullptr },
+    { L"Enable and Perform Visible Lines Syntax Check", CheckWagicVisibleLinesSyntax, 0, false, nullptr },
     { L"Enable and Perform All Lines Syntax Check (VERY SLOW)", CheckWagicAllLinesSyntax, 0, false, nullptr },
     { L"", nullptr, 0, false, nullptr }, // Separator
 	{ L"About...", showAbout, 0, false, nullptr }
@@ -81,7 +84,7 @@ std::vector<std::string> keywords = {
     "checkex", "chooseaname", "clone", "coinflipped", "coloringest", "combatphases", "combatends", "colors", "combatspiritlink", 
     "combattriggerrule", "commandzonecast", "compare", "completedungeon", "conjure", "connect", "connectrule", "continue", "controller", "copied", 
     "copiedacard", "copy", "costx", "count", "countb", "counter", "countermod", "counterremoved", "countershroud", "countersoneone",
-    "countertrack", "coven", "create", "cumulativeupcost", "cycled", "damage", "deadcreart", "deadpermanent", "deathtouchrule", "defense", "delayed", 
+    "countertrack", "coven", "create", "cumulativeupcost", "cycled", "damage", "deadcreart", "deadpermanent", "deathtouchrule", "delayed", 
     "delirium", "deplete", "destroy", "didattack", "didblock", "didnotcastnontoken", "didntattack", "discard", "discardbyopponent", "doboast", "doesntempty", 
     "doforetell", "donothing", "dontremove", "dontshow", "dotrain", "doubleside", "draw", "dredgerule", "duplicate", "duplicatecounters", "dynamicability", 
     "eachother", "epic", "equalto", "equalto~", "equip", "equipment", "equipped", "evicttypes", "evolve", "except", "exchangelife", "exert", "exilecast", 
@@ -90,7 +93,7 @@ std::vector<std::string> keywords = {
     "half", "hasdead", "hasdefender", "hasexerted", "haunt", "haunted", "head", "hiddenmoveto", "hmodifer", "identify", "imprint", "imprintedcard", "ingest", 
     "itself", "kamiflip", "keepname", "kicked!", "kicker", "kickerrule", "lastturn", "legendrule", "lessorequalcreatures", "lessorequallands", "lessthan", "lessthan~", 
     "level", "librarybottom", "librarycast", "librarysecond", "librarytop", "life", "lifeleech", "lifelinkrule", "lifeloss", "lifeset", "limit", "limit^", "livingweapon", 
-    "lord", "loseabilities", "loseability", "losesatype", "losesubtypesof", "lost", "loyalty", "madnessplayed", "manafaceup", "manapool", "manifest", "max", "maxcast", 
+    "lord", "loseabilities", "loseability", "losesatype", "losesubtypesof", "lost", "madnessplayed", "manafaceup", "manapool", "manifest", "max", "maxcast", 
     "maxlevel", "maxplay", "meld", "meldfrom", "message", "miracle", "modbenchant", "morbid", "morecardsthanopponent", "morethan", "morethan~", "morph", "morphrule", 
     "most", "movedto", "moverandom", "moveto", "mutated", "mutateover", "mutateunder", "mutationover", "mutationunder", "myfoe", "myname", "myorigname", "myself", 
     "myturnonly", "name", "named!", "nameingest", "never", "newability", "newcolors", "newhook", "newtarget", "next", "nextphase", "ninjutsu", "noevent", "nolegend", 
@@ -240,7 +243,8 @@ std::vector<std::string> constants = {
     "mytargx", "mytargkicked", "thricetype", "thricepower", "plifelost", "poisoncount", "pstormcountplus", "battlefieldplus", "allgravecardtypesplus", "xplus", "targetedpersonshandminus", 
     "opponenthandminusendmathend", "myhandminusendmathend", "opponenthandminus", "minustype", "mathlifetotalminusopponentlifetotalminusendmathend", "targetedpersonshandminusend",
     "opponentpoolsave","mathtype", "opponenthandminusendmathend", "myhandminusendmathend", "hascnttower", "thricekicked", "lowest", "myexilepluspginstantsorceryplusend",
-    "hascntdavrieleffect", "hascntjaceeffect", "hascntghostform", "minusoplifelostminusend", "twicepdrewcount", "minusohandcountminusend", "manacostminus4minusend"
+    "hascntdavrieleffect", "hascntjaceeffect", "hascntghostform", "minusoplifelostminusend", "twicepdrewcount", "minusohandcountminusend", "manacostminus4minusend",
+    "hascntogrecasted"
     // Add any additional Wagic constant here
 };
 
@@ -324,6 +328,45 @@ std::vector<std::string> types = {
 
 std::vector<std::string> allVectors;
 
+static void initLogger() {
+    // Init the logger
+    if (!logger || !logger.is_open()) {
+        remove("log.txt");
+        logger.open("log.txt", std::ios_base::app);
+    }
+}
+
+static void stopLogger() {
+    // Stop the logger and remove logfile
+    if (logger && logger.is_open()) {
+        logger.close();
+        remove("log.txt");
+    }
+}
+
+static void log(std::string logLevel, std::string text) {
+    // Log the string with the selected loglevel
+    initLogger();
+    logger << "{" << logLevel << "} - " << text;
+    logger.flush();
+}
+
+// Trim all the white spaces at the begin and the end of an UTF-8 stringa
+static std::string trimUTF8(const std::string& str) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    std::wstring wstr = converter.from_bytes(str);
+
+    size_t first = wstr.find_first_not_of(L" \t\n\r\f\v");
+    if (first == std::wstring::npos)
+        return std::string();
+
+    size_t last = wstr.find_last_not_of(L" \t\n\r\f\v");
+    if (last == std::wstring::npos)
+        return std::string();
+
+    return converter.to_bytes(wstr.substr(first, last - first + 1));
+}
+
 static bool containsWordBetween(const std::string openingTag, const std::string closingTag, const std::string& line, const std::string& word, const int pos) {
     std::string wordToCheck = word;
     std::string lineToCheck = line;
@@ -351,8 +394,8 @@ static bool containsWordBetween(const std::string openingTag, const std::string 
         // Get the substring between openingTag and closingTag
         std::string nameValue = lineToCheck.substr(openingPos + openingTag.length(), closingPos - openingPos - openingTag.length());
 
-        // Trim the spaces
-        nameValue.erase(std::remove_if(nameValue.begin(), nameValue.end(), ::isspace), nameValue.end());
+        // Trim the white spaces
+        nameValue = trimUTF8(nameValue);
 
         // Find the word in the substring
         size_t wordPos = nameValue.find(wordToCheck);
@@ -368,12 +411,6 @@ static bool containsWordBetween(const std::string openingTag, const std::string 
 
 static void SetStyles() {
     active = true;
-
-    // Init the logger
-    if (debug && (!logger || !logger.is_open())) {
-        remove("log.txt");
-        logger.open("log.txt", std::ios_base::app);
-    }
 
     // Set the default style
     ::SendMessage(nppData._scintillaMainHandle, SCI_STYLECLEARALL, 0, 0);
@@ -404,15 +441,21 @@ static LRESULT handleScnModified(SCNotification* notification) {
         int lineEndPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETLINEENDPOSITION, currentLine, 0);
         int wordStartPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_WORDSTARTPOSITION, currentPosition, true);
         int wordEndPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_WORDENDPOSITION, currentPosition, true);
-
+        // Check if the current row needs to receive suggestions or not
         std::string lineText = editor.GetLine(currentLine);
-        int index = lineText.find("=");
-        if ((index < 0) || !(lineText.find("text=") != 0 && lineText.find("partner=") != 0 && lineText.find("backside=") != 0 && lineText.find("name=") != 0 && lineText.find("power=") != 0 && lineText.find("toughness=") != 0 &&
-            lineText.find("type=") != 0 && lineText.find("subtype=") != 0 && lineText.find("grade=") != 0 && lineText.find("#") != 0))
+        if (!(lineText.find("text=") != 0 && lineText.find("partner=") != 0 && lineText.find("backside=") != 0 && 
+            lineText.find("name=") != 0 && lineText.find("power=") != 0 && lineText.find("toughness=") != 0 &&
+            lineText.find("type=") != 0 && lineText.find("subtype=") != 0 && lineText.find("grade=") != 0))
             return -1;
-
+        if (lineText[0] == '#' && lineText.find("#AUTO_DEFINE") == std::string::npos)
+            return -1;
+        int index = lineText.find("#AUTO_DEFINE");
+        if (index < 0) {
+            index = lineText.find("=");
+            if (index < 0)
+                return -1;
+        }
         editor.AutoCSetAutoHide(false);
-
         if (wordStartPosition != wordEndPosition) {
             std::string currentWord = editor.GetText().substr(wordStartPosition, wordEndPosition);
             currentWord = currentWord.substr(0, currentWord.find_first_of('\r'));
@@ -435,15 +478,13 @@ static LRESULT handleScnModified(SCNotification* notification) {
             if (currentWord[currentWord.length() - 1] == ')' || currentWord[currentWord.length() - 1] == ']' || 
                 currentWord[currentWord.length() - 1] == '}' || currentWord[currentWord.length() - 1] == '!')
                 currentWord = currentWord.substr(0, currentWord.length() - 1);
-
+            // Fill the list of possibile suggestions matching the current word
             std::vector<std::string> matchingSuggestions;
-
             for (const std::string& suggestion : allVectors) {
                 if (suggestion.compare(0, currentWord.length(), currentWord) == 0) {
                     matchingSuggestions.push_back(suggestion);
                 }
             }
-
             if (!matchingSuggestions.empty()) {
                 // Merge all the suggetsions in a unique string with '\n' sperator
                 std::string suggestionsString;
@@ -457,7 +498,6 @@ static LRESULT handleScnModified(SCNotification* notification) {
                 editor.AutoCSetSeparator('\n');
                 editor.AutoCSetAutoHide(true);
             }
-
             SetStyles();
             CheckWagicLineSyntax(currentLine);
             return 0;
@@ -475,10 +515,7 @@ static void disablePlugin() {
     int endpos = editor.GetLength();
     ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, 0, 0x1f);
     ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endpos, SCE_C_OPERATOR);
-    if (debug && logger && logger.is_open()) {
-        logger.close();
-        remove("log.txt");
-    }
+    stopLogger();
 }
 
 static void CheckWagicCurrentLineSyntax() {
@@ -493,13 +530,27 @@ static void CheckWagicAllLinesSyntax() {
         CheckWagicLineSyntax(i);
 }
 
+static void CheckWagicVisibleLinesSyntax()
+{
+    SetStyles();
+    int lineCount = editor.GetLineCount();
+    int firstLine = editor.GetFirstVisibleLine();
+    int visibleLineCount = editor.LinesOnScreen();
+    if (lineCount > visibleLineCount) {
+        for (int i = firstLine; i < firstLine + visibleLineCount; i++)
+            CheckWagicLineSyntax(i);
+    } else {
+        for (int i = 0; i < lineCount; i++) 
+            CheckWagicLineSyntax(i);
+    }
+}
+
 static void CheckWagicLineSyntax(int i) {
     if (i < 0)
         i = editor.LineFromPosition(editor.GetCurrentPos());
     std::string lineText = editor.GetLine(i);
     std::transform(lineText.begin(), lineText.end(), lineText.begin(),
         [](unsigned char c) { return std::tolower(c); });
-
     // Check if it's a comment row
     if (lineText[0] == '#' && lineText.find("#auto_define") == std::string::npos) {
         ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, editor.PositionFromLine(i), 0x1f);
@@ -523,13 +574,12 @@ static void CheckWagicLineSyntax(int i) {
                 return;
         }
         lineText = lineText.substr(offset);
-
         size_t pos = 0;
         bool triggerRow = false;
         bool macroRow = false;
         while (pos != std::string::npos && pos < lineText.length()) {
             while (pos < lineText.length() && lineText[pos] != '_' && lineText[pos] != '@' && (lineText[pos] < 97 || lineText[pos] > 122)) {
-                if (pos < lineText.length())
+                if (pos < lineText.length()) 
                     pos++;
             }
             int startPos = pos;
@@ -627,11 +677,8 @@ static void CheckWagicLineSyntax(int i) {
                 {
                     ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos , 0x1f);
                     ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_ESCAPESEQUENCE);
-                    if (debug && logger && logger.is_open()) {
-                        word = "\"" + word + "\"" + "\n";
-                        logger << "{ERR} - " << "unknown word in line (" << i << "): " << word;
-                        logger.flush();
-                    }
+                    std::string text = "unknown word in line (" + std::to_string(i) + "): \"" + word + "\"\n";
+                    log("ERR", text);
                 }
             }
         }
@@ -645,13 +692,9 @@ static void CheckWagicLineSyntax(int i) {
                     if (endPos > editor.GetLineEndPosition(i))
                         endPos = editor.GetLineEndPosition(i);
                     // Apply the correct color
-                    if (std::find(triggers.begin(), triggers.end(), trigger) != triggers.end())
-                    {
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_TASKMARKER);
-                    }
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_TASKMARKER);
                     lastfound += trigger.length();
-                    break;
                 }
             }
         }
@@ -667,143 +710,133 @@ static void CheckWagicLineSyntax(int i) {
                     if (endPos > editor.GetLineEndPosition(i))
                         endPos = editor.GetLineEndPosition(i);
                     // Apply the correct color
-                    if (std::find(macros.begin(), macros.end(), macro) != macros.end())
-                    {
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_HASHQUOTEDSTRING);
-                    }
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_HASHQUOTEDSTRING);
                     lastfound += macro.length();
-                    pos = lastfound;
-                    break;
                 }
             }
         }
-        // Check the unbalanced parenthesis
-        std::string openBrackets = "([{";
-        std::string closeBrackets = ")]}";
-
-        std::stack<int> bracketsStack1;
-        std::stack<int> bracketsStack2;
-        std::stack<int> bracketsStack3;
-        std::stack<int> bracketsStack4;
-        std::stack<int> bracketsStack5;
-
-        for (size_t j = 0; j < lineText.length(); j++) {
-            char currentChar = lineText[j];
-            int startPos = editor.PositionFromLine(i) + j + offset;
-            if ((openBrackets.find(currentChar) != std::string::npos) || (currentChar == '$' && lineText[j + 1] == '!') || (currentChar == '!')) {
-                int delta = 0;
-                if (currentChar == '(') {
-                    bracketsStack1.push(startPos);
-                }
-                else if (currentChar == '[') {
-                    bracketsStack2.push(startPos);
-                }
-                else if (currentChar == '{') {
-                    bracketsStack3.push(startPos);
-                }
-                else if (currentChar == '$') {
-                    bracketsStack4.push(startPos);
-                    delta = 1;
-                }
-                else if (currentChar == '!') {
-                    bracketsStack5.push(startPos);
-                    if ((lineText[j + 1] == '(') || (lineText[j + 1] == ':'))
-                        delta = 1;
-                }
-                ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1 + delta, SCE_C_WORD);
-            }
-            else if ((closeBrackets.find(currentChar) != std::string::npos) || (currentChar == '$' && lineText[j - 1] == '!')) {
-                if ((currentChar == ')' && bracketsStack1.empty()) || (currentChar == ']' && bracketsStack2.empty()) || (currentChar == '}' && bracketsStack3.empty()) || (currentChar == '$' && bracketsStack4.empty())) {
-                    // Unbalanced closing parenthesis
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
-                }
-                else if ((currentChar == ')' && !bracketsStack1.empty()) || (currentChar == ']' && !bracketsStack2.empty()) || (currentChar == '}' && !bracketsStack3.empty()) || (currentChar == '$' && !bracketsStack4.empty())) {
+        if (lineText.find('(') || lineText.find('[') || lineText.find('{') || lineText.find('$') || lineText.find('!')) {
+            // Check the all the unbalanced parenthesis
+            std::string openBrackets = "([{";
+            std::string closeBrackets = ")]}";
+            std::stack<int> bracketsStack1;
+            std::stack<int> bracketsStack2;
+            std::stack<int> bracketsStack3;
+            std::stack<int> bracketsStack4;
+            std::stack<int> bracketsStack5;
+            for (size_t j = 0; j < lineText.length(); j++) {
+                char currentChar = lineText[j];
+                int startPos = editor.PositionFromLine(i) + j + offset;
+                if ((openBrackets.find(currentChar) != std::string::npos) || (currentChar == '$' && lineText[j + 1] == '!') || (currentChar == '!')) {
                     int delta = 0;
-                    if (currentChar == ')') {
-                        bracketsStack1.pop();
-                        if (j < lineText.size() - 1 && lineText[j + 1] == '!')
-                            delta = 1;
+                    if (currentChar == '(') {
+                        bracketsStack1.push(startPos);
                     }
-                    else if (currentChar == ']') {
-                        bracketsStack2.pop();
+                    else if (currentChar == '[') {
+                        bracketsStack2.push(startPos);
                     }
-                    else if (currentChar == '}') {
-                        bracketsStack3.pop();
+                    else if (currentChar == '{') {
+                        bracketsStack3.push(startPos);
                     }
                     else if (currentChar == '$') {
-                        bracketsStack4.pop();
-                        if (lineText[j - 1] == '!') {
+                        bracketsStack4.push(startPos);
+                        delta = 1;
+                    }
+                    else if (currentChar == '!') {
+                        bracketsStack5.push(startPos);
+                        if ((lineText[j + 1] == '(') || (lineText[j + 1] == ':'))
                             delta = 1;
-                            startPos--;
-                        }
                     }
                     ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
                     ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1 + delta, SCE_C_WORD);
-                    // Handle with the last char of row
-                    if (j == lineText.length() - 1) {
-                        // Unbalanced opening parenthesis at the end of row
-                        int lastPos = editor.PositionFromLine(i) + j + offset + 1;
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, lastPos, 0x1f);
+                }
+                else if ((closeBrackets.find(currentChar) != std::string::npos) || (currentChar == '$' && lineText[j - 1] == '!')) {
+                    if ((currentChar == ')' && bracketsStack1.empty()) || (currentChar == ']' && bracketsStack2.empty()) || (currentChar == '}' && bracketsStack3.empty()) || (currentChar == '$' && bracketsStack4.empty())) {
+                        // Unbalanced closing parenthesis
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
                         ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
-                        ::SendMessage(nppData._scintillaMainHandle, SCI_STYLESETFORE, SCE_C_ESCAPESEQUENCE, RGB(0, 0, 255)); // Imposta il colore blu per la parentesi aperta non bilanciata
+                    }
+                    else if ((currentChar == ')' && !bracketsStack1.empty()) || (currentChar == ']' && !bracketsStack2.empty()) || (currentChar == '}' && !bracketsStack3.empty()) || (currentChar == '$' && !bracketsStack4.empty())) {
+                        int delta = 0;
+                        if (currentChar == ')') {
+                            bracketsStack1.pop();
+                            if (j < lineText.size() - 1 && lineText[j + 1] == '!')
+                                delta = 1;
+                        }
+                        else if (currentChar == ']') {
+                            bracketsStack2.pop();
+                        }
+                        else if (currentChar == '}') {
+                            bracketsStack3.pop();
+                        }
+                        else if (currentChar == '$') {
+                            bracketsStack4.pop();
+                            if (lineText[j - 1] == '!') {
+                                delta = 1;
+                                startPos--;
+                            }
+                        }
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1 + delta, SCE_C_WORD);
+                        // Handle with the last char of row
+                        if (j == lineText.length() - 1) {
+                            // Unbalanced opening parenthesis at the end of row
+                            int lastPos = editor.PositionFromLine(i) + j + offset + 1;
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, lastPos, 0x1f);
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_STYLESETFORE, SCE_C_ESCAPESEQUENCE, RGB(0, 0, 255)); // Imposta il colore blu per la parentesi aperta non bilanciata
+                        }
                     }
                 }
             }
-        }
-
-        // Check if there are '(' still remaining
-        while (!bracketsStack1.empty()) {
-            // Unbalanced opening parenthesis
-            int startPos = bracketsStack1.top();
-            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
-
-            bracketsStack1.pop();
-        }
-
-        // Check if there are '[' still remaining
-        while (!bracketsStack2.empty()) {
-            // Unbalanced opening parenthesis
-            int startPos = bracketsStack2.top();
-            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
-
-            bracketsStack2.pop();
-        }
-
-        // Check if there are '{' still remaining
-        while (!bracketsStack3.empty()) {
-            // Unbalanced opening parenthesis
-            int startPos = bracketsStack3.top();
-            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
-
-            bracketsStack3.pop();
-        }
-
-        //Check if there are '$' still remaining
-        while (!bracketsStack4.empty()) {
-            // Unbalanced opening dollar
-            int startPos = bracketsStack4.top();
-            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
-            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
-
-            bracketsStack4.pop();
-        }
-
-        // Check if there are '!' still remaining
-        int even = bracketsStack5.size() % 2;
-        while (!bracketsStack5.empty()) {
-            // Unbalanced opening mark
-            if (even != 0) {
-                int startPos = bracketsStack5.top();
+            // Check if there are '(' still remaining
+            while (!bracketsStack1.empty()) {
+                // Unbalanced opening parenthesis
+                int startPos = bracketsStack1.top();
                 ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
                 ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
+
+                bracketsStack1.pop();
             }
-            bracketsStack5.pop();
+            // Check if there are '[' still remaining
+            while (!bracketsStack2.empty()) {
+                // Unbalanced opening parenthesis
+                int startPos = bracketsStack2.top();
+                ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
+
+                bracketsStack2.pop();
+            }
+            // Check if there are '{' still remaining
+            while (!bracketsStack3.empty()) {
+                // Unbalanced opening parenthesis
+                int startPos = bracketsStack3.top();
+                ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
+
+                bracketsStack3.pop();
+            }
+            //Check if there are '$' still remaining
+            while (!bracketsStack4.empty()) {
+                // Unbalanced opening dollar
+                int startPos = bracketsStack4.top();
+                ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
+
+                bracketsStack4.pop();
+            }
+            // Check if there are '!' still remaining
+            int even = bracketsStack5.size() % 2;
+            while (!bracketsStack5.empty()) {
+                // Unbalanced opening mark
+                if (even != 0) {
+                    int startPos = bracketsStack5.top();
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
+                }
+                bracketsStack5.pop();
+            }
         }
     }
 }
@@ -812,12 +845,6 @@ static void SetCurrentEditor() {
     int which = -1;
     SendMessage(nppData._nppHandle, NPPM_GETCURRENTSCINTILLA, SCI_UNUSED, (LPARAM)&which);
     editor = (which == 0) ? editor1 : editor2;
-
-    // Init the logger
-    if (debug && (!logger || !logger.is_open())) {
-        remove("log.txt");
-        logger.open("log.txt", std::ios_base::app);
-    }
 
     // Initialize the full vector starting from the single ones.
     if (allVectors.empty()) {
@@ -848,16 +875,17 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification * notifyCode) {
     switch (notifyCode->nmhdr.code) {
     case NPPN_BUFFERACTIVATED:
         SetCurrentEditor();
-        CheckWagicCurrentLineSyntax();
+        if (active)
+            CheckWagicVisibleLinesSyntax();
         break;
-    case SCN_UPDATEUI:
     case NPPN_FILEOPENED:
     case NPPN_READY:
-        if(active)
-            CheckWagicCurrentLineSyntax();
+    case SCN_UPDATEUI:
+        if (active)
+            CheckWagicVisibleLinesSyntax();
         break;
     case SCN_MODIFIED:
-        if(active)
+        if (active)
             handleScnModified(notifyCode);
         break;
     case NPPN_SHUTDOWN:
