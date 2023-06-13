@@ -399,7 +399,7 @@ static bool containsWordBetween(const std::string openingTag, const std::string 
 
         // Find the word in the substring
         size_t wordPos = nameValue.find(wordToCheck);
-        if (wordPos != std::string::npos && pos > openingPos && pos < (closingPos + delta))
+        if (wordPos != std::string::npos && pos > (openingPos + delta) && pos < (closingPos + delta))
             return true;
 
         // Try to seek row to search on next iteration
