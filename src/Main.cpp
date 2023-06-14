@@ -549,7 +549,7 @@ static void CheckWagicVisibleLinesSyntax(SCNotification* notification)
     std::string newText = editor.GetText();
     bool force = (notification->nmhdr.code == NPPN_BUFFERACTIVATED) || (notification->nmhdr.code == NPPN_FILEOPENED) ||
         (notification->nmhdr.code == NPPN_READY) || (notification->nmhdr.code == SCN_ZOOM);
-    if (force || (currentFirstLine != firstLine) || (currentVisibleLineCount != visibleLineCount)) {
+    if ((currentText != newText) || (currentFirstLine != firstLine) || (currentVisibleLineCount != visibleLineCount) || (currentLineCount != lineCount)) {
         int startcheck = 0;
         int endcheck = 0;
         if (firstLine > currentFirstLine) {
@@ -560,16 +560,23 @@ static void CheckWagicVisibleLinesSyntax(SCNotification* notification)
             startcheck = firstLine;
             endcheck = firstLine + (currentFirstLine - firstLine);
         }
+        if (lineCount > currentLineCount) {
+            int currentPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETCURRENTPOS, 0, 0);
+            int currentLine = ::SendMessage(nppData._scintillaMainHandle, SCI_LINEFROMPOSITION, currentPosition, 0);
+            startcheck = currentLine - (lineCount - currentLineCount);
+            endcheck = startcheck + (lineCount - currentLineCount);
+        }
         if (force || (endcheck - startcheck) > visibleLineCount) {
             startcheck = firstLine;
             endcheck = (lineCount > visibleLineCount) ? (firstLine + visibleLineCount) : (firstLine + lineCount);
         }
-        for (int i = startcheck; i < endcheck; i++)
-            CheckWagicLineSyntax(i);
-
-    }
-    else if ((currentLineCount != lineCount) || (currentText != newText)) {
-        CheckWagicLineSyntax(-1);
+        if (startcheck == endcheck) {
+            CheckWagicLineSyntax(-1);
+        }
+        else {
+            for (int i = startcheck; i < endcheck; i++)
+                CheckWagicLineSyntax(i);
+        }
     }
     currentFirstLine = firstLine;
     currentVisibleLineCount = visibleLineCount;
