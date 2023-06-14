@@ -52,10 +52,11 @@ static ScintillaEditor editor;
 static bool active = true;
 // The stream for logger instance
 static std::ofstream logger;
-// The markers for current visible lines and total lines count
-static int currentLineCount;
-static int currentFirstLine;
-static int currentVisibleLineCount;
+// The markers for current text, current visible lines and total lines count
+static int currentLineCount = 0;
+static int currentFirstLine = 0;
+static int currentVisibleLineCount = 0;
+static std::string currentText;
 
 // Forward declaration of menu callbacks
 static void CheckWagicAllLinesSyntax();
@@ -67,11 +68,11 @@ static void ShowAbout();
 // The menu entries for the plugin
 static FuncItem menuItems[] = {
     // name, function, 0, is_checked, shortcut
-    { L"Disable Online Syntax Check", DisablePlugin, 0, false, nullptr },
-    { L"Enable and Perform Visible Lines Syntax Check", CheckWagicVisibleLinesSyntax, 0, false, nullptr },
-    { L"Enable and Perform All Lines Syntax Check (VERY SLOW)", CheckWagicAllLinesSyntax, 0, false, nullptr },
+    { L"Disable Online Syntax Check", DisablePlugin, 0, false, new ShortcutKey(false, false, true, 32) },
+    { L"Enable and Perform Visible Lines Syntax Check", CheckWagicVisibleLinesSyntax, 0, false, new ShortcutKey(false, true, false, 32) },
+    { L"Enable and Perform All Lines Syntax Check (VERY SLOW)", CheckWagicAllLinesSyntax, 0, false, nullptr},
     { L"", nullptr, 0, false, nullptr }, // Separator
-	{ L"About...", ShowAbout, 0, false, nullptr }
+	{ L"About...", ShowAbout, 0, false, new ShortcutKey(false, true, true, 32) }
 };
 
 std::vector<std::string> keywords = {
@@ -441,6 +442,8 @@ static LRESULT HandleScnModified(SCNotification* notification) {
     int wordStartPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_WORDSTARTPOSITION, currentPosition, true);
     int wordEndPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_WORDENDPOSITION, currentPosition, true);
     if (notification->modificationType & (SC_MOD_INSERTTEXT)) {
+        if (notification->text != NULL)
+            checked = -1;
         // Check if the current row needs to receive suggestions or not
         std::string lineText = editor.GetLine(currentLine);
         if (!(lineText.find("text=") != 0 && lineText.find("partner=") != 0 && lineText.find("backside=") != 0 && 
@@ -515,9 +518,6 @@ static LRESULT HandleScnModified(SCNotification* notification) {
             checked = 1;
         }
     }
-    // Check the syntax of current line after the text modification
-    SetStyles();
-    CheckWagicLineSyntax(currentLine);
     return checked;
 }
 
@@ -535,33 +535,53 @@ static void DisablePlugin() {
 
 static void CheckWagicAllLinesSyntax() {
     SetStyles();
-    int lineCount = editor.GetLineCount();
-    if (currentLineCount != lineCount) {
-        currentLineCount = lineCount;
-        for (int i = 0; i < lineCount; i++)
-            CheckWagicLineSyntax(i);
-    }
+    currentLineCount = editor.GetLineCount();
+    for (int i = 0; i < currentLineCount; i++)
+        CheckWagicLineSyntax(i);
 }
 
-static void CheckWagicVisibleLinesSyntax()
+static void CheckWagicVisibleLinesSyntax(SCNotification* notification)
 {
     SetStyles();
     int lineCount = editor.GetLineCount();
     int firstLine = editor.GetFirstVisibleLine();
     int visibleLineCount = editor.LinesOnScreen();
-    if ((currentFirstLine != firstLine) || (currentVisibleLineCount != visibleLineCount) || (currentLineCount != lineCount)) {
-        currentFirstLine = firstLine;
-        currentVisibleLineCount = visibleLineCount;
-        currentLineCount = lineCount;
-        if (lineCount > visibleLineCount) {
-            for (int i = firstLine; i < firstLine + visibleLineCount; i++)
-                CheckWagicLineSyntax(i);
+    std::string newText = editor.GetText();
+    bool force = (notification->nmhdr.code == NPPN_BUFFERACTIVATED) || (notification->nmhdr.code == NPPN_FILEOPENED) ||
+        (notification->nmhdr.code == NPPN_READY) || (notification->nmhdr.code == SCN_ZOOM);
+    if (force || (currentFirstLine != firstLine) || (currentVisibleLineCount != visibleLineCount)) {
+        int startcheck = 0;
+        int endcheck = 0;
+        if (firstLine > currentFirstLine) {
+            startcheck = currentFirstLine + visibleLineCount;
+            endcheck = startcheck + (firstLine - currentFirstLine);
         }
         else {
-            for (int i = 0; i < lineCount; i++)
-                CheckWagicLineSyntax(i);
+            startcheck = firstLine;
+            endcheck = firstLine + (currentFirstLine - firstLine);
         }
+        if (force || (endcheck - startcheck) > visibleLineCount) {
+            startcheck = firstLine;
+            endcheck = (lineCount > visibleLineCount) ? (firstLine + visibleLineCount) : (firstLine + lineCount);
+        }
+        for (int i = startcheck; i < endcheck; i++)
+            CheckWagicLineSyntax(i);
+
     }
+    else if ((currentLineCount != lineCount) || (currentText != newText)) {
+        CheckWagicLineSyntax(-1);
+    }
+    currentFirstLine = firstLine;
+    currentVisibleLineCount = visibleLineCount;
+    currentLineCount = lineCount;
+    currentText = newText;
+}
+
+static void CheckWagicVisibleLinesSyntax()
+{
+    SCNotification* notification = new SCNotification();
+    notification->nmhdr.code = NPPN_BUFFERACTIVATED;
+    CheckWagicVisibleLinesSyntax(notification);
 }
 
 static void CheckWagicLineSyntax(int i) {
@@ -897,13 +917,14 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification * notifyCode) {
     case NPPN_BUFFERACTIVATED:
         SetCurrentEditor();
         if (active)
-            CheckWagicVisibleLinesSyntax();
+            CheckWagicVisibleLinesSyntax(notifyCode);
         break;
     case NPPN_FILEOPENED:
     case NPPN_READY:
     case SCN_UPDATEUI:
+    case SCN_ZOOM:
         if (active)
-            CheckWagicVisibleLinesSyntax();
+            CheckWagicVisibleLinesSyntax(notifyCode);
         break;
     case SCN_MODIFIED:
         if (active)

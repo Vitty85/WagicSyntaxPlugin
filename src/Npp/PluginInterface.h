@@ -60,6 +60,8 @@ struct ShortcutKey
 	bool _isAlt;
 	bool _isShift;
 	UCHAR _key;
+
+	ShortcutKey(bool ctrl, bool alt, bool shift, UCHAR key) : _isCtrl(ctrl), _isAlt(alt), _isShift(shift), _key(key) {}
 };
 
 struct FuncItem

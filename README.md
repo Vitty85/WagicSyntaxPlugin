@@ -2,9 +2,9 @@
 The Wagic Primitives Syntax Plugin for Notepad++
 
 ## Usage
-The Plugin starts enabled by default, but you can disable it by using the plugin menu choice "Disable Online Syntax Check"
+The Plugin starts enabled by default, but you can disable it by using the plugin menu choice "Disable Online Syntax Check (SHIFT+SPACEBAR)"
 
-When the Plugin is disabled, you can activate it by using the plugin menu choice "Enable and Perform Visible Lines Syntax Check"
+When the Plugin is disabled, you can activate it by using the plugin menu choice "Enable and Perform Visible Lines Syntax Check (ALT+SPACEBAR)"
 
 The Plugin will automatically detect keywords, triggers, zones, macros and constants and it will highlight them using different colors:
 - Blue style for keywords
@@ -15,7 +15,7 @@ The Plugin will automatically detect keywords, triggers, zones, macros and const
 - Gray style for constants and basic abilities
 - Red style for unknown or wrong words
 
-The Plugin will automatically suggest Wagic keywords, triggers, zones, macros and constants by the Notepad++ suggestions popup menu (you can open it by pressing CTRL+SPACE).
+The Plugin will automatically suggest Wagic keywords, triggers, zones, macros and constants by the Notepad++ suggestions popup menu (you can open it by pressing CTRL+SPACEBAR).
 
 When enabled, the Plugin will perform by default an inline syntax check on the visible rows, to activate the full file check you can use the choice "Enable and Perform All Lines Syntax Check", but this option can heavily slow down the editor when the file is very big.
 
