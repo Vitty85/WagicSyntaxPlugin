@@ -52,25 +52,26 @@ static ScintillaEditor editor;
 static bool active = true;
 // The stream for logger instance
 static std::ofstream logger;
+// The markers for current visible lines and total lines count
+static int currentLineCount;
+static int currentFirstLine;
+static int currentVisibleLineCount;
 
 // Forward declaration of menu callbacks
-static void SetStyles();
 static void CheckWagicAllLinesSyntax();
-static void CheckWagicCurrentLineSyntax();
 static void CheckWagicVisibleLinesSyntax();
 static void CheckWagicLineSyntax(int i);
-static void CheckUnbalancedParenthesys(int line, int offset);
-static void disablePlugin();
-static void showAbout();
+static void DisablePlugin();
+static void ShowAbout();
 
 // The menu entries for the plugin
 static FuncItem menuItems[] = {
     // name, function, 0, is_checked, shortcut
-    { L"Disable Online Syntax Check", disablePlugin, 0, false, nullptr },
+    { L"Disable Online Syntax Check", DisablePlugin, 0, false, nullptr },
     { L"Enable and Perform Visible Lines Syntax Check", CheckWagicVisibleLinesSyntax, 0, false, nullptr },
     { L"Enable and Perform All Lines Syntax Check (VERY SLOW)", CheckWagicAllLinesSyntax, 0, false, nullptr },
     { L"", nullptr, 0, false, nullptr }, // Separator
-	{ L"About...", showAbout, 0, false, nullptr }
+	{ L"About...", ShowAbout, 0, false, nullptr }
 };
 
 std::vector<std::string> keywords = {
@@ -426,38 +427,41 @@ static void SetStyles() {
     ::SendMessage(nppData._scintillaMainHandle, SCI_STYLESETFORE, SCE_C_PREPROCESSOR, RGB(120, 120, 120)); // Gray style for macros
     ::SendMessage(nppData._scintillaMainHandle, SCI_STYLESETFORE, SCE_C_OPERATOR, RGB(0, 0, 0)); // Black style for operators
 
-    // Set the style for mismatched parentheses
+    // Set the style for mismatched brackets
     ::SendMessage(nppData._scintillaMainHandle, SCI_STYLESETFORE, SCE_C_ESCAPESEQUENCE, RGB(255, 0, 0)); // Red style for errors
 }
 
-static LRESULT handleScnModified(SCNotification* notification) {
+static LRESULT HandleScnModified(SCNotification* notification) {
+    int checked = 0;
+    // Get the info about the current line and position
+    int currentPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETCURRENTPOS, 0, 0);
+    int currentLine = ::SendMessage(nppData._scintillaMainHandle, SCI_LINEFROMPOSITION, currentPosition, 0);
+    int lineStartPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_POSITIONFROMLINE, currentLine, 0);
+    int lineEndPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETLINEENDPOSITION, currentLine, 0);
+    int wordStartPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_WORDSTARTPOSITION, currentPosition, true);
+    int wordEndPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_WORDENDPOSITION, currentPosition, true);
     if (notification->modificationType & (SC_MOD_INSERTTEXT)) {
-        // Get the info about the current line and position
-        int currentPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETCURRENTPOS, 0, 0);
-        int currentLine = ::SendMessage(nppData._scintillaMainHandle, SCI_LINEFROMPOSITION, currentPosition, 0);
-        int lineStartPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_POSITIONFROMLINE, currentLine, 0);
-        int lineEndPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETLINEENDPOSITION, currentLine, 0);
-        int wordStartPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_WORDSTARTPOSITION, currentPosition, true);
-        int wordEndPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_WORDENDPOSITION, currentPosition, true);
         // Check if the current row needs to receive suggestions or not
         std::string lineText = editor.GetLine(currentLine);
         if (!(lineText.find("text=") != 0 && lineText.find("partner=") != 0 && lineText.find("backside=") != 0 && 
             lineText.find("name=") != 0 && lineText.find("power=") != 0 && lineText.find("toughness=") != 0 &&
             lineText.find("type=") != 0 && lineText.find("subtype=") != 0 && lineText.find("grade=") != 0))
-            return -1;
+            checked = -1;
         if (lineText[0] == '#' && lineText.find("#AUTO_DEFINE") == std::string::npos)
-            return -1;
+            checked = -1;
         int index = lineText.find("#AUTO_DEFINE");
         if (index < 0) {
             index = lineText.find("=");
             if (index < 0)
-                return -1;
+                checked = -1;
         }
-        if (wordStartPosition != wordEndPosition) {
+        if (!checked && (wordStartPosition != wordEndPosition)) {
             std::string currentWord = editor.GetText().substr(wordStartPosition, wordEndPosition);
+            // Remove all the chars which can disturb the word recognition
             currentWord = currentWord.substr(0, currentWord.find_first_of('\r'));
             currentWord = currentWord.substr(0, currentWord.find_first_of('\n'));
             currentWord = currentWord.substr(0, currentWord.find_first_of('\t'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('\"'));
             currentWord = currentWord.substr(0, currentWord.find_first_of(' '));
             currentWord = currentWord.substr(0, currentWord.find_first_of(')'));
             currentWord = currentWord.substr(0, currentWord.find_first_of('('));
@@ -466,15 +470,26 @@ static LRESULT handleScnModified(SCNotification* notification) {
             currentWord = currentWord.substr(0, currentWord.find_first_of('{'));
             currentWord = currentWord.substr(0, currentWord.find_first_of('}'));
             currentWord = currentWord.substr(0, currentWord.find_first_of('$'));
-            currentWord = currentWord.substr(0, currentWord.find_first_of('$'));
             currentWord = currentWord.substr(0, currentWord.find_first_of('!'));
-            currentWord = currentWord.substr(0, currentWord.find_first_of('!'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of(':'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('^'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('/'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('<'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('>'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of(','));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('.'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('|'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('='));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('-'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('+'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('%'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of(';'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('*'));
+            currentWord = currentWord.substr(0, currentWord.find_first_of('&'));
+            // Include some special chars in the word (e.g for triggers and macros)
             if (editor.GetText().substr(wordStartPosition - 1, 1) == "@" || editor.GetText().substr(wordStartPosition - 1, 1) == "_" ||
                 editor.GetText().substr(wordStartPosition - 1, 1) == "~")
                 currentWord = editor.GetText().substr(wordStartPosition - 1, 1) + currentWord;
-            if (currentWord[currentWord.length() - 1] == ')' || currentWord[currentWord.length() - 1] == ']' || 
-                currentWord[currentWord.length() - 1] == '}' || currentWord[currentWord.length() - 1] == '!')
-                currentWord = currentWord.substr(0, currentWord.length() - 1);
             // Fill the list of possibile suggestions matching the current word
             std::vector<std::string> matchingSuggestions;
             for (const std::string& suggestion : allVectors) {
@@ -497,19 +512,20 @@ static LRESULT handleScnModified(SCNotification* notification) {
                 editor.AutoCShow(currentWord.length(), suggestionsString);
                 editor.AutoCSetSeparator('\n');
             }
-            SetStyles();
-            CheckWagicLineSyntax(currentLine);
-            return 0;
+            checked = 1;
         }
     }
-    return -1;
+    // Check the syntax of current line after the text modification
+    SetStyles();
+    CheckWagicLineSyntax(currentLine);
+    return checked;
 }
 
-static void showAbout() {
+static void ShowAbout() {
 	ShowAboutDialog((HINSTANCE)dllModule, MAKEINTRESOURCE(IDD_ABOUTDLG), nppData._nppHandle);
 }
 
-static void disablePlugin() {
+static void DisablePlugin() {
     active = false;
     int endpos = editor.GetLength();
     ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, 0, 0x1f);
@@ -517,16 +533,14 @@ static void disablePlugin() {
     stopLogger();
 }
 
-static void CheckWagicCurrentLineSyntax() {
-    SetStyles();
-    CheckWagicLineSyntax(-1);
-}
-
 static void CheckWagicAllLinesSyntax() {
     SetStyles();
     int lineCount = editor.GetLineCount();
-    for (int i = 0; i < lineCount; i++)
-        CheckWagicLineSyntax(i);
+    if (currentLineCount != lineCount) {
+        currentLineCount = lineCount;
+        for (int i = 0; i < lineCount; i++)
+            CheckWagicLineSyntax(i);
+    }
 }
 
 static void CheckWagicVisibleLinesSyntax()
@@ -535,12 +549,18 @@ static void CheckWagicVisibleLinesSyntax()
     int lineCount = editor.GetLineCount();
     int firstLine = editor.GetFirstVisibleLine();
     int visibleLineCount = editor.LinesOnScreen();
-    if (lineCount > visibleLineCount) {
-        for (int i = firstLine; i < firstLine + visibleLineCount; i++)
-            CheckWagicLineSyntax(i);
-    } else {
-        for (int i = 0; i < lineCount; i++) 
-            CheckWagicLineSyntax(i);
+    if ((currentFirstLine != firstLine) || (currentVisibleLineCount != visibleLineCount) || (currentLineCount != lineCount)) {
+        currentFirstLine = firstLine;
+        currentVisibleLineCount = visibleLineCount;
+        currentLineCount = lineCount;
+        if (lineCount > visibleLineCount) {
+            for (int i = firstLine; i < firstLine + visibleLineCount; i++)
+                CheckWagicLineSyntax(i);
+        }
+        else {
+            for (int i = 0; i < lineCount; i++)
+                CheckWagicLineSyntax(i);
+        }
     }
 }
 
@@ -715,8 +735,8 @@ static void CheckWagicLineSyntax(int i) {
                 }
             }
         }
-        if (lineText.find('(') || lineText.find('[') || lineText.find('{') || lineText.find('$') || lineText.find('!')) {
-            // Check the all the unbalanced parenthesis
+        if (lineText.find('(') || lineText.find('[') || lineText.find('{') || lineText.find('<') || lineText.find('$') || lineText.find('!')) {
+            // Check the all the unbalanced brackets
             std::string openBrackets = "([{";
             std::string closeBrackets = ")]}";
             std::stack<int> bracketsStack1;
@@ -751,12 +771,14 @@ static void CheckWagicLineSyntax(int i) {
                     ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1 + delta, SCE_C_WORD);
                 }
                 else if ((closeBrackets.find(currentChar) != std::string::npos) || (currentChar == '$' && lineText[j - 1] == '!')) {
-                    if ((currentChar == ')' && bracketsStack1.empty()) || (currentChar == ']' && bracketsStack2.empty()) || (currentChar == '}' && bracketsStack3.empty()) || (currentChar == '$' && bracketsStack4.empty())) {
-                        // Unbalanced closing parenthesis
+                    if ((currentChar == ')' && bracketsStack1.empty()) || (currentChar == ']' && bracketsStack2.empty()) || 
+                        (currentChar == '}' && bracketsStack3.empty()) || (currentChar == '$' && bracketsStack4.empty())) {
+                        // Unbalanced closing brackets
                         ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
                         ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
                     }
-                    else if ((currentChar == ')' && !bracketsStack1.empty()) || (currentChar == ']' && !bracketsStack2.empty()) || (currentChar == '}' && !bracketsStack3.empty()) || (currentChar == '$' && !bracketsStack4.empty())) {
+                    else if ((currentChar == ')' && !bracketsStack1.empty()) || (currentChar == ']' && !bracketsStack2.empty()) || 
+                        (currentChar == '}' && !bracketsStack3.empty()) || (currentChar == '$' && !bracketsStack4.empty())) {
                         int delta = 0;
                         if (currentChar == ')') {
                             bracketsStack1.pop();
@@ -780,7 +802,7 @@ static void CheckWagicLineSyntax(int i) {
                         ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1 + delta, SCE_C_WORD);
                         // Handle with the last char of row
                         if (j == lineText.length() - 1) {
-                            // Unbalanced opening parenthesis at the end of row
+                            // Unbalanced opening brackets at the end of row
                             int lastPos = editor.PositionFromLine(i) + j + offset + 1;
                             ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, lastPos, 0x1f);
                             ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
@@ -791,7 +813,7 @@ static void CheckWagicLineSyntax(int i) {
             }
             // Check if there are '(' still remaining
             while (!bracketsStack1.empty()) {
-                // Unbalanced opening parenthesis
+                // Unbalanced opening round brackets
                 int startPos = bracketsStack1.top();
                 ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
                 ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
@@ -800,7 +822,7 @@ static void CheckWagicLineSyntax(int i) {
             }
             // Check if there are '[' still remaining
             while (!bracketsStack2.empty()) {
-                // Unbalanced opening parenthesis
+                // Unbalanced opening square brackets
                 int startPos = bracketsStack2.top();
                 ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
                 ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
@@ -809,7 +831,7 @@ static void CheckWagicLineSyntax(int i) {
             }
             // Check if there are '{' still remaining
             while (!bracketsStack3.empty()) {
-                // Unbalanced opening parenthesis
+                // Unbalanced opening brace curly brackets
                 int startPos = bracketsStack3.top();
                 ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
                 ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
@@ -818,7 +840,7 @@ static void CheckWagicLineSyntax(int i) {
             }
             //Check if there are '$' still remaining
             while (!bracketsStack4.empty()) {
-                // Unbalanced opening dollar
+                // Unbalanced opening dollar char
                 int startPos = bracketsStack4.top();
                 ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
                 ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, 1, SCE_C_ESCAPESEQUENCE);
@@ -828,7 +850,7 @@ static void CheckWagicLineSyntax(int i) {
             // Check if there are '!' still remaining
             int even = bracketsStack5.size() % 2;
             while (!bracketsStack5.empty()) {
-                // Unbalanced opening mark
+                // Unbalanced opening mark char
                 if (even != 0) {
                     int startPos = bracketsStack5.top();
                     ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
@@ -858,13 +880,13 @@ static void SetCurrentEditor() {
 }
 
 LRESULT CALLBACK PluginWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-    if (message == WM_HOTKEY && active) {
+    // Check if the user pressed the HOTKEY
+    if (active && message == WM_HOTKEY) {
         SCNotification* notification = new SCNotification();
         notification->modificationType = SC_MOD_INSERTTEXT;
-        handleScnModified(notification);
+        HandleScnModified(notification);
         return 0;
     }
-
     // Pass the other events to main handle
     return ::CallWindowProc(OldPluginWndProc, hWnd, message, wParam, lParam);
 }
@@ -885,45 +907,25 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification * notifyCode) {
         break;
     case SCN_MODIFIED:
         if (active)
-            handleScnModified(notifyCode);
+            HandleScnModified(notifyCode);
         break;
     case NPPN_SHUTDOWN:
         if(active)
-            disablePlugin();
+            DisablePlugin();
         break;
     }
 
-}
-
-HWND GetScintillaHandle(HWND nppHandle) {
-    HWND scintillaHandle = nullptr;
-    HWND childWindow = ::FindWindowEx(nppHandle, nullptr, L"Scintilla", nullptr);
-
-    while (childWindow != nullptr) {
-        wchar_t className[256];
-        ::GetClassName(childWindow, className, sizeof(className) / sizeof(wchar_t));
-
-        if (std::wcscmp(className, L"Scintilla") == 0) {
-            scintillaHandle = childWindow;
-            break;
-        }
-
-        childWindow = ::FindWindowEx(nppHandle, childWindow, L"Scintilla", nullptr);
-    }
-
-    return scintillaHandle;
 }
 
 // Plugin initialization
 extern "C" __declspec(dllexport) void setInfo(NppData nppData) {
     ::nppData = nppData;
+    // Retrive the current editor
 	editor1.SetScintillaInstance(nppData._scintillaMainHandle);
 	editor2.SetScintillaInstance(nppData._scintillaSecondHandle);
     editor = editor1;
-
     // Register window handle of plugin
     OldPluginWndProc = (WNDPROC)::SetWindowLongPtr(nppData._nppHandle, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(PluginWndProc));
-
     // Register the Hotkey CTRL + SPACE
     ::RegisterHotKey(nppData._nppHandle, 1, MOD_CONTROL, VK_SPACE);
 }

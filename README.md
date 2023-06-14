@@ -19,7 +19,7 @@ The Plugin will automatically suggest Wagic keywords, triggers, zones, macros an
 
 When enabled, the Plugin will perform by default an inline syntax check on the visible rows, to activate the full file check you can use the choice "Enable and Perform All Lines Syntax Check", but this option can heavily slow down the editor when the file is very big.
 
-The Plugin will automatically detect unbalanced parenthesis in the current row (or file) and it will highlight them with red color, and this is true for '()', '[]', '{}', '$$' and '!!' couples.
+The Plugin will automatically detect unbalanced brackets in the current row (or file) and it will highlight them with red color, and this is true for '()', '[]', '{}', '$$' and '!!' couples.
 
 ## Installation
 Download the released zip file containing the WagicSyntaxPlugin.dll in its own subfolder and unzip it inside your NotePad++ plugin folder, then restart the editor.
