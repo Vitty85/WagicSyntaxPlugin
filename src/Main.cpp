@@ -548,8 +548,10 @@ static void CheckWagicVisibleLinesSyntax(SCNotification* notification)
     int visibleLineCount = editor.LinesOnScreen();
     std::string newText = editor.GetText();
     bool force = (notification->nmhdr.code == NPPN_BUFFERACTIVATED) || (notification->nmhdr.code == NPPN_FILEOPENED) ||
-        (notification->nmhdr.code == NPPN_READY) || (notification->nmhdr.code == SCN_ZOOM);
-    if ((currentText != newText) || (currentFirstLine != firstLine) || (currentVisibleLineCount != visibleLineCount) || (currentLineCount != lineCount)) {
+        (notification->nmhdr.code == NPPN_READY) || (notification->nmhdr.code == SCN_ZOOM) ||
+        ((notification->nmhdr.code == SCN_UPDATEUI && notification->updated == 1) && (currentText == newText));
+    if (force || (currentText != newText) || (currentFirstLine != firstLine) || 
+        (currentVisibleLineCount != visibleLineCount) || (currentLineCount != lineCount)) {
         int startcheck = 0;
         int endcheck = 0;
         if (firstLine > currentFirstLine) {
@@ -574,6 +576,8 @@ static void CheckWagicVisibleLinesSyntax(SCNotification* notification)
             CheckWagicLineSyntax(-1);
         }
         else {
+            if (endcheck < lineCount)
+                endcheck++;
             for (int i = startcheck; i < endcheck; i++)
                 CheckWagicLineSyntax(i);
         }
