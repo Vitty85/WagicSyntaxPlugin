@@ -124,7 +124,7 @@ std::vector<std::string> keywords = {
     "cantblocktarget", "endstep", "before", "attackers", "during", "dredge", "cleanup", "manacostlifegain", "opponentblockersonly", "powerlifegain", "cumulativeupcostmulti", 
     "sourcenottapped", "oneonecountersstrike", "powercountersoneone", "powerlifeloss", "manacoststrike", "chargelifegain", "myupkeep", "untaponly", "toughnesstrike", "chargedeplete", 
     "chargestrike", "manacostpumppow", "didcombatdamagetofoe", "manacostpumpboth", "manacostpumptough", "powerdraw", "colorspumpboth", "postbattle", "nonwall", "value", "twist", 
-    "emblem", "combatdamage", "convoke", "crew", "improvise", "delve", "emerge"
+    "emblem", "combatdamage", "convoke", "crew", "improvise", "delve", "emerge", "noproftrg"
     // Add any additional Wagic keyword here
 };
 
@@ -161,7 +161,8 @@ std::vector<std::string> triggers = {
     "@each opponent upkeep", "@each opponent firstmain", "@each opponent combatbegins", "@each opponent attackers", "@each opponent blockers", 
     "@each opponent combatdamage", "@each opponent combatends", "@each opponent secondmain", "@each opponent end", "@each opponent cleanup", 
     "@each opponent untap", "@next endofturn", "@next beginofturn", "@next upkeep", "@next firstmain", "@next combatbegins", "@next attackers", 
-    "@next blockers", "@next combatdamage", "@next combatends", "@next secondmain", "@next end", "@next cleanup", "@next untap"
+    "@next blockers", "@next combatdamage", "@next combatends", "@next secondmain", "@next end", "@next cleanup", "@next untap", "@proliferateof", 
+    "@proliferatefoeof"
     // Add any additional Wagic trigger here
 };
 
@@ -246,7 +247,7 @@ std::vector<std::string> constants = {
     "opponenthandminusendmathend", "myhandminusendmathend", "opponenthandminus", "minustype", "mathlifetotalminusopponentlifetotalminusendmathend", "targetedpersonshandminusend",
     "opponentpoolsave","mathtype", "opponenthandminusendmathend", "myhandminusendmathend", "hascnttower", "thricekicked", "lowest", "myexilepluspginstantsorceryplusend",
     "hascntdavrieleffect", "hascntjaceeffect", "hascntghostform", "minusoplifelostminusend", "twicepdrewcount", "minusohandcountminusend", "manacostminus4minusend",
-    "hascntogrecasted"
+    "hascntogrecasted", "totcntallanycnt", "minusmypoisoncountminusend", "minusopponentpoisoncountminusend"
     // Add any additional Wagic constant here
 };
 
@@ -546,38 +547,49 @@ static void CheckWagicVisibleLinesSyntax(SCNotification* notification)
     int lineCount = editor.GetLineCount();
     int firstLine = editor.GetFirstVisibleLine();
     int visibleLineCount = editor.LinesOnScreen();
+    int selStart = editor.GetSelectionStart();
+    int selEnd = editor.GetSelectionEnd();
     std::string newText = editor.GetText();
     bool force = (notification->nmhdr.code == NPPN_BUFFERACTIVATED) || (notification->nmhdr.code == NPPN_FILEOPENED) ||
         (notification->nmhdr.code == NPPN_READY) || (notification->nmhdr.code == SCN_ZOOM) ||
-        ((notification->nmhdr.code == SCN_UPDATEUI && notification->updated == 1) && (currentText == newText));
+        ((notification->nmhdr.code == SCN_UPDATEUI && notification->updated == 1) && (newText == currentText)) ||
+        ((notification->nmhdr.code == SCN_UPDATEUI && notification->updated == 1) && (lineCount > currentLineCount));
     if (force || (currentText != newText) || (currentFirstLine != firstLine) || 
         (currentVisibleLineCount != visibleLineCount) || (currentLineCount != lineCount)) {
         int startcheck = 0;
         int endcheck = 0;
-        if (firstLine > currentFirstLine) {
+        if (!force && (firstLine > currentFirstLine)) {
             startcheck = currentFirstLine + visibleLineCount;
             endcheck = startcheck + (firstLine - currentFirstLine);
         }
-        else {
+        if (!force && (firstLine < currentFirstLine)) {
             startcheck = firstLine;
             endcheck = firstLine + (currentFirstLine - firstLine);
         }
-        if (lineCount > currentLineCount) {
+        if (!force && (lineCount > currentLineCount)) {
             int currentPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETCURRENTPOS, 0, 0);
             int currentLine = ::SendMessage(nppData._scintillaMainHandle, SCI_LINEFROMPOSITION, currentPosition, 0);
             startcheck = currentLine - (lineCount - currentLineCount);
             endcheck = startcheck + (lineCount - currentLineCount);
         }
+        if (!force && (lineCount < currentLineCount)) {
+            startcheck = firstLine + visibleLineCount - (currentLineCount - lineCount);
+            endcheck = startcheck + (currentLineCount - lineCount);
+        }
         if (force || (endcheck - startcheck) > visibleLineCount) {
             startcheck = firstLine;
             endcheck = (lineCount > visibleLineCount) ? (firstLine + visibleLineCount) : (firstLine + lineCount);
         }
-        if (startcheck == endcheck) {
+        if (startcheck >= endcheck) {
             CheckWagicLineSyntax(-1);
         }
         else {
+            if (startcheck < 0)
+                startcheck = 0;
             if (endcheck < lineCount)
                 endcheck++;
+            if (endcheck > lineCount)
+                endcheck = lineCount;
             for (int i = startcheck; i < endcheck; i++)
                 CheckWagicLineSyntax(i);
         }
@@ -675,6 +687,11 @@ static void CheckWagicLineSyntax(int i) {
                         lineText[endPos - offset - editor.PositionFromLine(i)] != ':') {
                         ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
                         ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_COMMENTDOC);
+                    }
+                    if (word == "from" && (endPos - offset - editor.PositionFromLine(i) < lineText.length()) &&
+                        lineText[endPos - offset - editor.PositionFromLine(i)] != '(') {
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_PREPROCESSOR);
                     }
                 }
                 else if (std::find(zones.begin(), zones.end(), word) != zones.end())
