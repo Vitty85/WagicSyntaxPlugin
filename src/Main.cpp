@@ -226,7 +226,7 @@ std::vector<std::string> constants = {
     "findfirsttypenonpermanent", "findfirsttypeelemental", "findfirsttypeelf", "findfirsttypeland", "oppofindfirsttypeland", "opponentpoolsave",
     "findfirsttypeplaneswalker", "findfirsttypeenchantment", "hasmansymw", "hasmansymr", "hasmansymg", "hasmansymu", "hasmansymb", "mypoolsave", 
     "prexx", "opponentdamagecount", "thatmuchcountersoneone","mytargx", "mytargkicked", "plifelost", "poisoncount", "oppofindfirsttypenonland", 
-   "lowest", "usedmanab", "usedmanag", "usedmanaw", "usedmanau", "usedmanar", "usedmanatot"
+    "lowest", "usedmanab", "usedmanag", "usedmanaw", "usedmanau", "usedmanar", "usedmanatot", "toxicity", "hastoxic", "ninelands"
     // Add any additional Wagic constant here
 };
 
@@ -259,7 +259,8 @@ std::vector<std::string> basicabilities = {
     "nonight", "nodamageremoved", "backgroundpartner", "bottomlibrarydeath", "noloyaltydamage", "nodefensedamage", "affinityallcreatures", 
     "affinitycontrollercreatures", "affinityopponentcreatures", "affinityalldeadcreatures", "affinityparty", "affinityenchantments", "mutate",
     "affinitybasiclandtypes", "affinitytwobasiclandtypes", "affinitygravecreatures", "affinityattackingcreatures", "affinitygraveinstsorc", 
-    "canloyaltytwice", "attached", "fresh", "snowplainswalk", "snowislandwalk", "snowswampwalk", "snowmountainwalk", "snowforestwalk", "desertwalk"
+    "canloyaltytwice", "attached", "fresh", "snowplainswalk", "snowislandwalk", "snowswampwalk", "snowmountainwalk", "snowforestwalk", "desertwalk",
+    "poisonfourtoxic", "poisonfivetoxic", "poisonsixtoxic", "poisonseventoxic", "poisoneighttoxic", "poisonninetoxic", "poisontentoxic", "addedtoxic"
     // Add any additional Wagic basic ability here
 };
 
