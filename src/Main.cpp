@@ -128,7 +128,7 @@ std::vector<std::string> keywords = {
     "cleanup", "manacostlifegain", "opponentblockersonly", "powerlifegain", "cumulativeupcostmulti", "sourcenottapped", "oneonecountersstrike", 
     "powercountersoneone", "powerlifeloss", "manacoststrike", "chargelifegain", "myupkeep", "untaponly", "toughnesstrike", "chargedeplete", 
     "chargestrike", "manacostpumppow", "didcombatdamagetofoe", "manacostpumpboth", "manacostpumptough", "powerdraw", "colorspumpboth", "postbattle", 
-    "nonwall", "value", "twist", "emblem", "combatdamage", "convoke", "crew", "improvise", "delve", "emerge"
+    "nonwall", "value", "twist", "emblem", "combatdamage", "convoke", "crew", "improvise", "delve", "emerge", "readytofight"
     // Add any additional Wagic keyword here
 };
 
@@ -163,7 +163,7 @@ std::vector<std::string> triggers = {
     "@each opponent attackers", "@each opponent blockers", "@each opponent combatdamage", "@each opponent combatends", "@each opponent secondmain", 
     "@each opponent end", "@each opponent cleanup", "@each opponent untap", "@next endofturn", "@next beginofturn", "@next upkeep", 
     "@next firstmain", "@next combatbegins", "@next attackers", "@next blockers", "@next combatdamage", "@next combatends", "@next secondmain", 
-    "@next end", "@next cleanup", "@next untap", "@proliferateof", "@proliferatefoeof"
+    "@next end", "@next cleanup", "@next untap", "@proliferateof", "@proliferatefoeof", "@ninjutsued"
     // Add any additional Wagic trigger here
 };
 
@@ -666,7 +666,7 @@ static void CheckWagicLineSyntax(int i) {
             int endPos = pos;
             bool found = false;
             std::string word = lineText.substr(startPos, endPos - startPos);
-            if (!containsWordBetween("name(", ")", lineText, word, startPos)){
+            if (!containsWordBetween("name(", ")", lineText, word, startPos) && !containsWordBetween("named!:", ":!", lineText, word, startPos)){
                 startPos = editor.PositionFromLine(i) + startPos + offset;
                 endPos = startPos + word.length();
                 if (endPos > editor.GetLineEndPosition(i))
