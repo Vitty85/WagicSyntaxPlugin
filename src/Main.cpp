@@ -111,7 +111,7 @@ std::vector<std::string> keywords = {
     "revealuntil", "revealzone", "revolt", "sacrifice", "scry", "scryend", "scryzone", "selectmana", "serumpowder", "setblocker", "sethand", 
     "setpower", "settoughness", "shackle", "shuffle", "sidecast", "single", "skill", "soulbondrule", "source", "sourceinplay", "sourcenottap", 
     "sourcetap", "spellmover", "spent", "spiritlink", "srccontroller", "srcopponent", "standard", "steal", "surveil", "suspended", "suspendrule", 
-    "swap", "tail", "tails", "takeninitiativeof", "taketheinitiative", "tap", "target", "targetcontroller", "targetopponent", "teach", "terminate", 
+    "swap", "tail", "tails", "taketheinitiative", "tap", "target", "targetcontroller", "targetopponent", "teach", "terminate", "becomesringbearer",
     "text", "this", "thisforeach", "thisturn", "time", "toughnesslifegain", "to", "token", "tokencleanuprule", "tokencreated", "tosrc", "total", 
     "trained", "trainer", "transforms", "trigger", "turn", "turnlimited", "turns", "tutorial", "type", "uent", "ueot", "undocpy", "unearthrule",
     "untap", "upcost", "upcostmulti", "uynt", "vampired", "vampirerule", "vanishing", "while", "winability", "wingame", "with", "withenchant", 
@@ -128,7 +128,7 @@ std::vector<std::string> keywords = {
     "cleanup", "manacostlifegain", "opponentblockersonly", "powerlifegain", "cumulativeupcostmulti", "sourcenottapped", "oneonecountersstrike", 
     "powercountersoneone", "powerlifeloss", "manacoststrike", "chargelifegain", "myupkeep", "untaponly", "toughnesstrike", "chargedeplete", 
     "chargestrike", "manacostpumppow", "didcombatdamagetofoe", "manacostpumpboth", "manacostpumptough", "powerdraw", "colorspumpboth", "postbattle", 
-    "nonwall", "value", "twist", "emblem", "combatdamage", "convoke", "crew", "improvise", "delve", "emerge", "readytofight"
+    "nonwall", "value", "twist", "emblem", "combatdamage", "convoke", "crew", "improvise", "delve", "emerge", "readytofight", "theringtempts"
     // Add any additional Wagic keyword here
 };
 
@@ -149,7 +149,7 @@ std::vector<std::string> zones = {
 // List of Wagic triggers
 std::vector<std::string> triggers = {
     "@tappedformana", "@becomesmonarchof", "@drawof", "@combat", "@boasted", "@targeted", "@lifelostfoeof", "@noncombatdamagefoeof", 
-    "@takeninitiativeof", "@energizedof", "@counteradded", "@totalcounteradded", "@scryed", "@producedmana", "@becomesmonarchfoeof", 
+    "@takeninitiativeof", "@takeninitiativefoeof", "@energizedof", "@counteradded", "@totalcounteradded", "@scryed", "@producedmana",
     "@dierolled", "@damageof", "@sacrificed", "@combatdamaged", "@shuffledfoeof", "@cycled", "@poisonedfoeof", "@foretold", "@energizedfoeof", 
     "@discarded", "@tokencreated", "@phasedin", "@untapped", "@drawfoeof", "@combatdamagefoeof", "@exploited", "@poisonedof", "@exerted", 
     "@movedTo", "@experiencedof", "@counterremoved", "@vampired", "@countermod", "@experiencedfoeof", "@shuffledof", "@lifeof", "@noncombatdamaged", 
@@ -163,7 +163,8 @@ std::vector<std::string> triggers = {
     "@each opponent attackers", "@each opponent blockers", "@each opponent combatdamage", "@each opponent combatends", "@each opponent secondmain", 
     "@each opponent end", "@each opponent cleanup", "@each opponent untap", "@next endofturn", "@next beginofturn", "@next upkeep", 
     "@next firstmain", "@next combatbegins", "@next attackers", "@next blockers", "@next combatdamage", "@next combatends", "@next secondmain", 
-    "@next end", "@next cleanup", "@next untap", "@proliferateof", "@proliferatefoeof", "@ninjutsued"
+    "@next end", "@next cleanup", "@next untap", "@proliferateof", "@proliferatefoeof", "@ninjutsued", "@ringtemptedof", "@ringtemptedfoeof",
+    "@becomesmonarchfoeof", "@bearerchosen", "@bearernewchosen"
     // Add any additional Wagic trigger here
 };
 
@@ -173,12 +174,13 @@ std::vector<std::string> macros = {
     "_BLOCKED_", "_HEROIC_", "_RALLY_", "_LANDFALL_", "_ADDENDUM_", "_CONSTELLATION_", "_AMASS_", "_SCRY_", "_SCRY1_", "_SCRY2_", "_SCRY3_", 
     "_SCRY4_", "_SCRY5_", "_FABRICATE_", "_ENRAGE_", "_SECOND_DRAW_", "_ADAPT_", "_BATTALION_", "_CHAMPION_", "_METALCRAFT_", "_KNIGHTTOKEN_",
     "_THRESHOLD_", "_SPLICEARCANE_", "_RIPPLE_", "_RECOVER_", "_CLASH_", "_PROLIFERATE_", "_SCAVENGE_", "_MONSTROSITY_", "_OUTLAST_", "_ECHO_",
-    "_INVESTIGATE_", "_ASCEND_", "_CITY'S_BLESSING_","_MONARCH_CONTROLLER_""_MONARCH_OPPONENT_", "_INITIATIVE_CONTROLLER_""_INITIATIVE_OPPONENT_", 
-    "_EXPLORE_", "_TREASURE_", "_CASTHISTORIC_", "_MENTOR_", "_SURVEIL1_", "_SURVEIL2_", "_SURVEIL3_", "_UNDERGROWTH_", "_AFTERLIFETOKEN_", 
-    "_RIOT_", "_LEARN_", "_SPECTACLE_", "_ADVENTURE_", "_EXTORT_", "_FORETELL_", "_LOOT_", "_UNEARTH_", "__PLAY_TOP_FROM_EXILE__", "_WARD_", 
-    "_RENOWN_", "_BLINK_UEOT_", "_CONNIVES_", "_ETERNALIZE_", "_DISCARD&DRAW_", "_PUNCH_", "_MUST_BE_BLOCKD_", "_ANGELTOKEN_", "_BEASTTOKEN_", 
-    "_DRAGONTOKEN_", "_ELEPHANTTOKEN_", "_GOBLINTOKEN_", "_INSECTTOKEN_",  "_PHYREXIANMITETOKEN_", "_REDELEMENTALTOKEN_", "_HARNESSED_CONTROL_",
-    "_SAPROLINGTOKEN_", "_SERVOTOKEN_", "_SOLDIERTOKEN_", "_SPIRITTOKEN_", "_THOPTERTOKEN_", "_WOLFTOKEN_", "_ZOMBIETOKEN_", "_HARNESSED_LIGHTNING_"
+    "_INVESTIGATE_", "_ASCEND_", "_CITY'S_BLESSING_", "_EXPLORE_", "_MONARCH_CONTROLLER_", "_MONARCH_OPPONENT_", "_INITIATIVE_CONTROLLER_",
+    "_INITIATIVE_OPPONENT_", "_TREASURE_", "_CASTHISTORIC_", "_MENTOR_", "_SURVEIL1_", "_SURVEIL2_", "_SURVEIL3_", "_UNDERGROWTH_", "_RIOT_",
+    "_AFTERLIFETOKEN_", "_LEARN_", "_SPECTACLE_", "_ADVENTURE_", "_EXTORT_", "_FORETELL_", "_LOOT_", "_UNEARTH_", "__PLAY_TOP_FROM_EXILE__",
+    "_WARD_", "_RENOWN_", "_BLINK_UEOT_", "_CONNIVES_", "_ETERNALIZE_", "_DISCARD&DRAW_", "_PUNCH_", "_MUST_BE_BLOCKD_", "_ANGELTOKEN_", 
+    "_BEASTTOKEN_", "_DRAGONTOKEN_", "_ELEPHANTTOKEN_", "_GOBLINTOKEN_", "_INSECTTOKEN_", "_PHYREXIANMITETOKEN_", "_REDELEMENTALTOKEN_", 
+    "_HARNESSED_LIGHTNING_", "_SAPROLINGTOKEN_", "_SERVOTOKEN_", "_SOLDIERTOKEN_", "_SPIRITTOKEN_", "_THOPTERTOKEN_", "_WOLFTOKEN_", 
+    "_ZOMBIETOKEN_", "_HARNESSED_CONTROL_", "_AMASSORC1_", "_AMASSORC2_", "_AMASSORC3_", "_AMASSORC4_", "_AMASSORC5_", "_RINGTEMPTS_"
     // Add any additional Wagic macro here
 };
 
@@ -227,7 +229,7 @@ std::vector<std::string> constants = {
     "findfirsttypeplaneswalker", "findfirsttypeenchantment", "hasmansymw", "hasmansymr", "hasmansymg", "hasmansymu", "hasmansymb", "mypoolsave", 
     "prexx", "opponentdamagecount", "thatmuchcountersoneone","mytargx", "mytargkicked", "plifelost", "poisoncount", "oppofindfirsttypenonland", 
     "lowest", "usedmanab", "usedmanag", "usedmanaw", "usedmanau", "usedmanar", "usedmanatot", "toxicity", "hastoxic", "ninelands", "mytgtforced",
-    "numofactivation"
+    "numofactivation", "pringtemptations", "oringtemptations"
     // Add any additional Wagic constant here
 };
 
@@ -261,7 +263,7 @@ std::vector<std::string> basicabilities = {
     "affinitycontrollercreatures", "affinityopponentcreatures", "affinityalldeadcreatures", "affinityparty", "affinityenchantments", "mutate",
     "affinitybasiclandtypes", "affinitytwobasiclandtypes", "affinitygravecreatures", "affinityattackingcreatures", "affinitygraveinstsorc", 
     "canloyaltytwice", "attached", "fresh", "snowplainswalk", "snowislandwalk", "snowswampwalk", "snowmountainwalk", "snowforestwalk", "desertwalk",
-    "poisonfourtoxic", "poisonfivetoxic", "poisonsixtoxic", "poisonseventoxic", "poisoneighttoxic", "poisonninetoxic", "poisontentoxic", "addedtoxic"
+    "poisonfourtoxic", "poisonfivetoxic", "poisonsixtoxic", "poisonseventoxic", "poisoneighttoxic", "poisonninetoxic", "poisontentoxic", "ringbearer"
     // Add any additional Wagic basic ability here
 };
 
@@ -556,16 +558,18 @@ static void CheckWagicVisibleLinesSyntax(SCNotification* notification)
             int currentPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETCURRENTPOS, 0, 0);
             int currentLine = ::SendMessage(nppData._scintillaMainHandle, SCI_LINEFROMPOSITION, currentPosition, 0);
             startcheck = currentLine - (lineCount - currentLineCount);
-            endcheck = startcheck + (lineCount - currentLineCount);
+            endcheck = currentLine + (lineCount - currentLineCount);
         }
         if (!force && (lineCount < currentLineCount)) {
             if (lineCount > visibleLineCount) {
-                startcheck = firstLine + visibleLineCount - (currentLineCount - lineCount);
-                endcheck = startcheck + (currentLineCount - lineCount);
+                int currentPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETCURRENTPOS, 0, 0);
+                int currentLine = ::SendMessage(nppData._scintillaMainHandle, SCI_LINEFROMPOSITION, currentPosition, 0);
+                startcheck = currentLine - (currentLineCount - lineCount);
+                endcheck = currentLine + (currentLineCount - lineCount);
             }
             else {
                 startcheck = firstLine + lineCount - (currentLineCount - lineCount);
-                endcheck = startcheck + (currentLineCount - lineCount);
+                endcheck = firstLine + lineCount + (currentLineCount - lineCount);
             }
         }
         if (force || (endcheck - startcheck) > visibleLineCount) {
