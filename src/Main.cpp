@@ -229,7 +229,7 @@ std::vector<std::string> constants = {
     "findfirsttypeplaneswalker", "findfirsttypeenchantment", "hasmansymw", "hasmansymr", "hasmansymg", "hasmansymu", "hasmansymb", "mypoolsave", 
     "prexx", "opponentdamagecount", "thatmuchcountersoneone","mytargx", "mytargkicked", "plifelost", "poisoncount", "oppofindfirsttypenonland", 
     "lowest", "usedmanab", "usedmanag", "usedmanaw", "usedmanau", "usedmanar", "usedmanatot", "toxicity", "hastoxic", "ninelands", "mytgtforced",
-    "numofactivation", "pringtemptations", "oringtemptations"
+    "numofactivation", "pringtemptations", "oringtemptations", "myhasdead", "oppohasdead"
     // Add any additional Wagic constant here
 };
 
@@ -1034,6 +1034,38 @@ static void CheckWagicLineSyntax(int i) {
                             ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
                         }
                         else if (!subword.empty() && subtoklen == 0) {
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen, 0x1f);
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_ESCAPESEQUENCE);
+                            std::string text = "unknown word in line (" + std::to_string(i) + "): \"" + subword + "\"\n";
+                            log("ERR", text);
+                        }
+                    }
+                }
+                if (!found && !word.empty() && (word.find("myhasdead") != std::string::npos || word.find("oppohasdead") != std::string::npos)) {
+                    subfound = true;
+                    int starttok = word.find("myhasdead");
+                    int toklen = 9;
+                    if (starttok < 0) {
+                        starttok = word.find("oppohasdead");
+                        toklen = 11;
+                    }
+                    if (starttok < 0) {
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_ESCAPESEQUENCE);
+                        std::string text = "unknown word in line (" + std::to_string(i) + "): \"" + word + "\"\n";
+                        log("ERR", text);
+                    }
+                    else {
+                        std::string subword = word.substr(starttok, toklen);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                        subword = word.substr(starttok + toklen, word.length() - toklen - starttok);
+                        if (std::find(types.begin(), types.end(), subword) != types.end())
+                        {
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen, 0x1f);
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                        }
+                        else if (!subword.empty()) {
                             ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen, 0x1f);
                             ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_ESCAPESEQUENCE);
                             std::string text = "unknown word in line (" + std::to_string(i) + "): \"" + subword + "\"\n";
