@@ -91,7 +91,7 @@ std::vector<std::string> keywords = {
     "duplicatecounters", "dynamicability", "eachother", "epic", "equalto", "equalto~", "equip", "evicttypes", "evolve", "except", "exchangelife", 
     "exert", "exileimp", "exploits", "explores", "fade", "fading", "fizzle", "fizzleto", "flanker", "flashbackrule", "flip", "flipped", "foelost", 
     "fog", "forceclean", "forcedalive", "forcefield", "forcetype", "foreach", "forever", "freeze", "from", "fromplay", "frozen", "gravecast", 
-    "half", "hasdead", "hasdefender", "hasexerted", "haunt", "haunted", "head", "hiddenmoveto", "hmodifer", "identify", "imprint", "imprintedcard", 
+    "half", "hasdefender", "hasexerted", "haunt", "haunted", "head", "hiddenmoveto", "hmodifer", "identify", "imprint", "imprintedcard", 
     "ingest", "itself", "kamiflip", "keepname", "kicked!", "kickerrule", "lastturn", "legendrule", "lessorequalcreatures", "lessorequallands", 
     "lessthan", "lessthan~", "level", "librarybottom", "librarycast", "librarysecond", "librarytop", "life", "lifeleech", "lifelinkrule", "limit",
     "lifeloss", "lifeset",  "livingweapon", "lord", "loseabilities", "loseability", "losesatype", "losesubtypesof", "lost", "madnessplayed", "max",
@@ -128,7 +128,8 @@ std::vector<std::string> keywords = {
     "cleanup", "manacostlifegain", "opponentblockersonly", "powerlifegain", "cumulativeupcostmulti", "sourcenottapped", "oneonecountersstrike", 
     "powercountersoneone", "powerlifeloss", "manacoststrike", "chargelifegain", "myupkeep", "untaponly", "toughnesstrike", "chargedeplete", 
     "chargestrike", "manacostpumppow", "didcombatdamagetofoe", "manacostpumpboth", "manacostpumptough", "powerdraw", "colorspumpboth", "postbattle", 
-    "nonwall", "value", "twist", "emblem", "combatdamage", "convoke", "crew", "improvise", "delve", "emerge", "readytofight", "theringtempts"
+    "nonwall", "value", "twist", "emblem", "combatdamage", "convoke", "crew", "improvise", "delve", "emerge", "readytofight", "theringtempts",
+    "oppoattacked", "untp"
     // Add any additional Wagic keyword here
 };
 
@@ -565,7 +566,7 @@ static void CheckWagicVisibleLinesSyntax(SCNotification* notification)
                 int currentPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETCURRENTPOS, 0, 0);
                 int currentLine = ::SendMessage(nppData._scintillaMainHandle, SCI_LINEFROMPOSITION, currentPosition, 0);
                 startcheck = currentLine - (currentLineCount - lineCount);
-                endcheck = currentLine + (currentLineCount - lineCount);
+                endcheck = currentLine + visibleLineCount - (currentLine - firstLine);
             }
             else {
                 startcheck = firstLine + lineCount - (currentLineCount - lineCount);
