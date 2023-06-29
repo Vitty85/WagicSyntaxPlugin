@@ -159,13 +159,13 @@ std::vector<std::string> triggers = {
     "@each endofturn", "@each beginofturn", "@each upkeep", "@each firstmain", "@each combatbegins", "@each attackers", "@each blockers", 
     "@each combatdamage", "@each combatends", "@each secondmain", "@each end", "@each cleanup", "@each untap", "@each my endofturn", 
     "@each my beginofturn", "@each my upkeep", "@each my firstmain", "@each my combatbegins", "@each my attackers", "@each my blockers", 
-    "@each my combatdamage", "@each my combatends", "@each my secondmain", "@each my end","@each my cleanup","@each my untap", 
+    "@each my combatdamage", "@each my combatends", "@each my secondmain", "@each my end","@each my cleanup","@each my untap", "@each draw",
     "@each opponent endofturn", "@each opponent beginofturn", "@each opponent upkeep", "@each opponent firstmain", "@each opponent combatbegins", 
     "@each opponent attackers", "@each opponent blockers", "@each opponent combatdamage", "@each opponent combatends", "@each opponent secondmain", 
-    "@each opponent end", "@each opponent cleanup", "@each opponent untap", "@next endofturn", "@next beginofturn", "@next upkeep", 
+    "@each opponent end", "@each opponent cleanup", "@each opponent untap", "@next endofturn", "@next beginofturn", "@next upkeep", "@each my draw",
     "@next firstmain", "@next combatbegins", "@next attackers", "@next blockers", "@next combatdamage", "@next combatends", "@next secondmain", 
-    "@next end", "@next cleanup", "@next untap", "@proliferateof", "@proliferatefoeof", "@ninjutsued", "@ringtemptedof", "@ringtemptedfoeof",
-    "@becomesmonarchfoeof", "@bearerchosen", "@bearernewchosen"
+    "@each opponent draw", "@next end", "@next cleanup", "@next untap", "@proliferateof", "@proliferatefoeof", "@ninjutsued", "@ringtemptedof", 
+    "@ringtemptedfoeof", "@becomesmonarchfoeof", "@bearerchosen", "@bearernewchosen"
     // Add any additional Wagic trigger here
 };
 
