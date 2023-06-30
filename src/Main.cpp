@@ -540,7 +540,7 @@ static void CheckWagicVisibleLinesSyntax(SCNotification* notification)
     int selEnd = editor.GetSelectionEnd();
     std::string newText = editor.GetText();
     bool force = (notification->nmhdr.code == NPPN_BUFFERACTIVATED) || (notification->nmhdr.code == NPPN_FILEOPENED) ||
-        (notification->nmhdr.code == NPPN_READY) || (notification->nmhdr.code == SCN_ZOOM) ||
+        (notification->nmhdr.code == NPPN_READY) || (notification->nmhdr.code == SCN_ZOOM) || (notification->nmhdr.code == SCN_FOCUSIN) ||
         ((notification->nmhdr.code == SCN_UPDATEUI && notification->updated == 1) && (newText == currentText)) ||
         ((notification->nmhdr.code == SCN_UPDATEUI && notification->updated == 1) && (lineCount > currentLineCount));
     if (force || (currentText != newText) || (currentFirstLine != firstLine) || 
@@ -1788,6 +1788,7 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification * notifyCode) {
         break;
     case NPPN_FILEOPENED:
     case NPPN_READY:
+    case SCN_FOCUSIN:
     case SCN_UPDATEUI:
     case SCN_ZOOM:
         if (active)
