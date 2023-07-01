@@ -24,7 +24,7 @@ The Plugin will automatically detect unbalanced brackets in the current row (or 
 ## Installation
 Download the released zip file containing the WagicSyntaxPlugin.dll in its own subfolder and unzip it inside your NotePad++ plugin folder, then restart the editor.
 
-BE AWARE: Currently the release is compiled for 64bit version, to use it on 32bit version you should recompile the DLL on the target architecture.
+Currently the release is compiled for both 32bit and 64bit version of Notepad++, so no need to recompile the DLL on the target architecture.
 
 ## Development
 The code is developed using Visual Studio 2019. Building the code will generate a DLL which can be used by Notepad++. For convenience, Visual Studio copies the DLL into the Notepad++ plugin directory.
