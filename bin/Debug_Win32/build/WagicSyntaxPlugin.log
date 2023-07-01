@@ -1,0 +1,18 @@
+﻿  AboutDialog.cpp
+  Hyperlinks.cpp
+  Main.cpp
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(395,49): warning C4018: '>': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(395,79): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(685,91): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(690,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(695,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(700,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(705,98): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(710,90): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(715,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(720,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
+  Generazione del codice in corso...
+     Creazione della libreria C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\bin\Debug_Win32\WagicSyntaxPlugin.lib e dell'oggetto C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\bin\Debug_Win32\WagicSyntaxPlugin.exp
+  WagicSyntaxPlugin.vcxproj -> C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\bin\Debug_Win32\WagicSyntaxPlugin.dll
+  Sottodirectory o file C:\Program Files (x86)\Notepad++\plugins\WagicSyntaxPlugin già esistente.
+          1 file copiati.
