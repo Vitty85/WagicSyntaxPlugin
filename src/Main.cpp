@@ -49,7 +49,7 @@ static ScintillaEditor editor2;
 // References the current editor
 static ScintillaEditor editor;
 // The plugin activation control flag
-static bool active = true;
+static bool active = false;
 // The stream for logger instance
 static std::ofstream logger;
 // The markers for current text, current visible lines and total lines count
@@ -68,7 +68,7 @@ static void ShowAbout();
 // The menu entries for the plugin
 static FuncItem menuItems[] = {
     // name, function, 0, is_checked, shortcut
-    { L"Disable Online Syntax Check", DisablePlugin, 0, false, new ShortcutKey(false, false, true, 32) },
+    { L"Disable Inline Syntax Check", DisablePlugin, 0, false, new ShortcutKey(false, false, true, 32) },
     { L"Enable and Perform Visible Lines Syntax Check", CheckWagicVisibleLinesSyntax, 0, false, new ShortcutKey(false, true, false, 32) },
     { L"Enable and Perform All Lines Syntax Check (VERY SLOW)", CheckWagicAllLinesSyntax, 0, false, nullptr},
     { L"", nullptr, 0, false, nullptr }, // Separator
