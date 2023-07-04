@@ -229,9 +229,9 @@ std::vector<std::string> constants = {
     "bothalldeadcreature", "findfirsttypeartifact", "findfirsttypepermanent", "oppofindfirsttypecreature", "oppofindfirsttypenonpermanent", 
     "findfirsttypenonpermanent", "findfirsttypeelemental", "findfirsttypeelf", "findfirsttypeland", "oppofindfirsttypeland", "opponentpoolsave",
     "findfirsttypeplaneswalker", "findfirsttypeenchantment", "hasmansymw", "hasmansymr", "hasmansymg", "hasmansymu", "hasmansymb", "mypoolsave", 
-    "prexx", "opponentdamagecount", "thatmuchcountersoneone","mytargx", "mytargkicked", "plifelost", "poisoncount", "oppofindfirsttypenonland", 
-    "lowest", "usedmanab", "usedmanag", "usedmanaw", "usedmanau", "usedmanar", "usedmanatot", "toxicity", "hastoxic", "ninelands", "mytgtforced",
-    "numofactivation", "pringtemptations", "oringtemptations", "myhasdead", "oppohasdead"
+    "prexx", "opponentdamagecount", "thatmuchcountersoneone", "plifelost", "poisoncount", "oppofindfirsttypenonland", "lowest", "usedmanab", 
+    "usedmanag", "usedmanaw", "usedmanau", "usedmanar", "usedmanatot", "toxicity", "hastoxic", "ninelands", "mytgtforced", "numofactivation", 
+    "pringtemptations", "oringtemptations", "myhasdead", "oppohasdead"
     // Add any additional Wagic constant here
 };
 
@@ -265,7 +265,8 @@ std::vector<std::string> basicabilities = {
     "affinitycontrollercreatures", "affinityopponentcreatures", "affinityalldeadcreatures", "affinityparty", "affinityenchantments", "mutate",
     "affinitybasiclandtypes", "affinitytwobasiclandtypes", "affinitygravecreatures", "affinityattackingcreatures", "affinitygraveinstsorc", 
     "canloyaltytwice", "attached", "fresh", "snowplainswalk", "snowislandwalk", "snowswampwalk", "snowmountainwalk", "snowforestwalk", "desertwalk",
-    "poisonfourtoxic", "poisonfivetoxic", "poisonsixtoxic", "poisonseventoxic", "poisoneighttoxic", "poisonninetoxic", "poisontentoxic", "ringbearer"
+    "poisonfourtoxic", "poisonfivetoxic", "poisonsixtoxic", "poisonseventoxic", "poisoneighttoxic", "poisonninetoxic", "poisontentoxic", "ringbearer",
+    "eqpasinst"
     // Add any additional Wagic basic ability here
 };
 
@@ -825,7 +826,7 @@ static void CheckWagicLineSyntax(int i) {
                             ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen, 0x1f);
                             ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_OPERATOR);
                         }
-                        else if (!subword.empty() && (word.find("stored") == std::string::npos) && 
+                        else if (!subword.empty() && (word.find("stored") == std::string::npos) && (word.find("mytarg") == std::string::npos) &&
                             (word.find("hasability") == std::string::npos) && (word.find("hascnt") == std::string::npos) &&
                             (word.find("cardcountabil") == std::string::npos) && (word.find("cardcounttype") == std::string::npos)) {
                             ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen, 0x1f);
@@ -926,6 +927,106 @@ static void CheckWagicLineSyntax(int i) {
                             ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
                         }
                         else if (!subword.empty() && subtoklen == 0 && (word.find("hascnt") == std::string::npos) && 
+                            (word.find("hasability") == std::string::npos) && (word.find("cardcounttype") == std::string::npos) &&
+                            (word.find("cardcountabil") == std::string::npos)) {
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen, 0x1f);
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_ESCAPESEQUENCE);
+                            std::string text = "unknown word in line (" + std::to_string(i) + "): \"" + subword + "\"\n";
+                            log("ERR", text);
+                        }
+                    }
+                }
+                if (!found && !word.empty() && (word.find("mytarg") != std::string::npos)) {
+                    subfound = true;
+                    int starttok = word.find("mytarg");
+                    int toklen = 6;
+                    if (starttok < 0) {
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endPos - startPos, SCE_C_ESCAPESEQUENCE);
+                        std::string text = "unknown word in line (" + std::to_string(i) + "): \"" + word + "\"\n";
+                        log("ERR", text);
+                    }
+                    else {
+                        std::string subword = word.substr(starttok, toklen);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok, 0x1f);
+                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                        subword = word.substr(starttok + toklen, word.length() - toklen - starttok);
+                        int startsubtok = subword.find("plus");
+                        int subtoklen = 4;
+                        if (startsubtok < 0) {
+                            startsubtok = subword.find("minus");
+                            subtoklen = 5;
+                        }
+                        if (startsubtok < 0) {
+                            startsubtok = subword.find("twice");
+                            subtoklen = 4;
+                        }
+                        if (startsubtok < 0) {
+                            startsubtok = subword.find("halfup");
+                            subtoklen = 6;
+                        }
+                        if (startsubtok < 0) {
+                            startsubtok = subword.find("halfdown");
+                            subtoklen = 8;
+                        }
+                        if (starttok < 0) {
+                            startsubtok = word.find("thirdup");
+                            subtoklen = 7;
+                        }
+                        if (starttok < 0) {
+                            startsubtok = word.find("thirddown");
+                            subtoklen = 9;
+                        }
+                        if (starttok < 0) {
+                            startsubtok = word.find("thrice");
+                            subtoklen = 6;
+                        }
+                        if (starttok < 0) {
+                            startsubtok = word.find("fourtimes");
+                            subtoklen = 9;
+                        }
+                        if (starttok < 0) {
+                            startsubtok = word.find("fivetimes");
+                            subtoklen = 9;
+                        }
+                        if (startsubtok >= 0) {
+                            subword = subword.substr(0, startsubtok);
+                        }
+                        else {
+                            startsubtok = 0;
+                            subtoklen = 0;
+                        }
+                        if (std::find(constants.begin(), constants.end(), subword) != constants.end())
+                        {
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen, 0x1f);
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                        }
+                        if (std::find(keywords.begin(), keywords.end(), subword) != keywords.end())
+                        {
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen, 0x1f);
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                        }
+                        else if (std::find(zones.begin(), zones.end(), subword) != zones.end())
+                        {
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen, 0x1f);
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                        }
+                        else if (std::find(constants.begin(), constants.end(), subword) != constants.end())
+                        {
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen, 0x1f);
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                        }
+                        else if (std::find(basicabilities.begin(), basicabilities.end(), subword) != basicabilities.end())
+                        {
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen, 0x1f);
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                        }
+                        else if (std::find(types.begin(), types.end(), subword) != types.end())
+                        {
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen, 0x1f);
+                            ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                        }
+                        else if (!subword.empty() && subtoklen == 0 && (word.find("hascnt") == std::string::npos) &&
                             (word.find("hasability") == std::string::npos) && (word.find("cardcounttype") == std::string::npos) &&
                             (word.find("cardcountabil") == std::string::npos)) {
                             ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen, 0x1f);
@@ -1240,9 +1341,32 @@ static void CheckWagicLineSyntax(int i) {
                                                     log("ERR", text);
                                                 }
                                             }
-                                            else {
-                                                startsubtok2 = 0;
-                                                subtoklen2 = 0;
+                                            if (startsubtok2 < 0) {
+                                                startsubtok2 = subword.find("mytarg");
+                                                subtoklen2 = 6;
+                                                if (startsubtok2 >= 0) {
+                                                    subword = subword.substr(startsubtok2 + subtoklen2, subword.length() - (startsubtok2 + subtoklen2));
+                                                    if (std::find(constants.begin(), constants.end(), subword) != constants.end())
+                                                    {
+                                                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen, 0x1f);
+                                                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                                                    }
+                                                    else if (std::find(keywords.begin(), keywords.end(), subword) != keywords.end())
+                                                    {
+                                                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen, 0x1f);
+                                                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                                                    }
+                                                    else if (!subword.empty()) {
+                                                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen + startsubtok2 + subtoklen2, 0x1f);
+                                                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_ESCAPESEQUENCE);
+                                                        std::string text = "unknown word in line (" + std::to_string(i) + "): \"" + subword + "\"\n";
+                                                        log("ERR", text);
+                                                    }
+                                                }
+                                                else {
+                                                    startsubtok2 = 0;
+                                                    subtoklen2 = 0;
+                                                }
                                             }
                                         }
                                     }
@@ -1388,9 +1512,37 @@ static void CheckWagicLineSyntax(int i) {
                                     log("ERR", text);
                                 }
                             }
-                            else {
-                                startsubtok2 = 0;
-                                subtoklen2 = 0;
+                            if (startsubtok2 < 0) {
+                                startsubtok2 = subword.find("mytarg");
+                                subtoklen2 = 6;
+                                if (startsubtok2 >= 0) {
+                                    subword = subword.substr(startsubtok2 + subtoklen2, subword.length() - (startsubtok2 + subtoklen2));
+                                    if (std::find(constants.begin(), constants.end(), subword) != constants.end())
+                                    {
+                                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen, 0x1f);
+                                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                                    }
+                                    else if (std::find(types.begin(), types.end(), subword) != types.end())
+                                    {
+                                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen, 0x1f);
+                                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                                    }
+                                    else if (std::find(keywords.begin(), keywords.end(), subword) != keywords.end())
+                                    {
+                                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen, 0x1f);
+                                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_PREPROCESSOR);
+                                    }
+                                    else if (!subword.empty()) {
+                                        ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, startPos + starttok + toklen + startsubtok + subtoklen + startsubtok2 + subtoklen2, 0x1f);
+                                        ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, subword.length(), SCE_C_ESCAPESEQUENCE);
+                                        std::string text = "unknown word in line (" + std::to_string(i) + "): \"" + subword + "\"\n";
+                                        log("ERR", text);
+                                    }
+                                }
+                                else {
+                                    startsubtok2 = 0;
+                                    subtoklen2 = 0;
+                                }
                             }
                         }
                         if (std::find(constants.begin(), constants.end(), subword) != constants.end())
