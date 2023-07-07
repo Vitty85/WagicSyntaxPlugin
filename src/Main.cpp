@@ -266,7 +266,7 @@ std::vector<std::string> basicabilities = {
     "affinitybasiclandtypes", "affinitytwobasiclandtypes", "affinitygravecreatures", "affinityattackingcreatures", "affinitygraveinstsorc", 
     "canloyaltytwice", "attached", "fresh", "snowplainswalk", "snowislandwalk", "snowswampwalk", "snowmountainwalk", "snowforestwalk", "desertwalk",
     "poisonfourtoxic", "poisonfivetoxic", "poisonsixtoxic", "poisonseventoxic", "poisoneighttoxic", "poisonninetoxic", "poisontentoxic", "ringbearer",
-    "eqpasinst"
+    "eqpasinst", "unsacrificable"
     // Add any additional Wagic basic ability here
 };
 
