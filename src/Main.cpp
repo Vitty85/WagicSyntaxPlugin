@@ -266,7 +266,7 @@ std::vector<std::string> basicabilities = {
     "affinitybasiclandtypes", "affinitytwobasiclandtypes", "affinitygravecreatures", "affinityattackingcreatures", "affinitygraveinstsorc", 
     "canloyaltytwice", "attached", "fresh", "snowplainswalk", "snowislandwalk", "snowswampwalk", "snowmountainwalk", "snowforestwalk", "desertwalk",
     "poisonfourtoxic", "poisonfivetoxic", "poisonsixtoxic", "poisonseventoxic", "poisoneighttoxic", "poisonninetoxic", "poisontentoxic", "ringbearer",
-    "eqpasinst", "unsacrificable"
+    "eqpasinst"
     // Add any additional Wagic basic ability here
 };
 
@@ -316,7 +316,7 @@ std::vector<std::string> types = {
     "kmoonfolk", "krat", "ksnake", "a", "spell", "aether", "burst", "kjeldoran", "war", "cry", "one", "kind", "saclands", "less", "creatures", "rg",
     "artifacts", "enchantments", "lands", "t", "r", "b", "u", "d", "s", "w", "g", "l", "x", "e", "c", "p", "gw", "rw", "wu", "gu", "bg", "wb", 
     "h", "i", "ub", "q", "ur", "xx", "n", "color", "kindle", "scion", "skyshipped", "splinter", "stangg", "twin", "sunweb", "visitation", "vecna", 
-    "mirror", "mad", "phantasm", "cost", "word", "autostack", "anycnt"
+    "mirror", "mad", "phantasm", "cost", "word", "autostack", "anycnt", "anytarget"
     // Add any additional Wagic types here
 };
 
