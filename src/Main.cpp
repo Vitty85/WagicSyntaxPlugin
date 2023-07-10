@@ -224,14 +224,14 @@ std::vector<std::string> constants = {
     "exerted", "expansion", "extracostshadow", "foretold", "geared", "hasbackside", "hasconvoke", "hasflashback", "haskicker", "haspartner", "hasx", 
     "icon", "lastnamechosen", "leveler", "manab", "manacost", "manag", "manar", "manau", "manaw", "mtgid", "multicolor", "mychild", "mycurses", 
     "myeqp", "mysource", "mytgt", "mytotem", "notshare!", "numofcols", "opponentdamager", "pairable", "parents", "partname", "preyname", 
-    "proliferation", "rarity", "recent", "sourcecard", "tapped", "targetedplayer", "targetter", "title", "unknown", "upto", "zpos", "notany", 
+    "rarity", "recent", "sourcecard", "tapped", "targetedplayer", "targetter", "title", "unknown", "upto", "zpos", "notany", "oppohasdead",
     "modified", "battleready", "findfirsttypenonland", "share", "types", "findfirsttypecreature", "controllerlife", "convertedcost", "untapped", 
     "bothalldeadcreature", "findfirsttypeartifact", "findfirsttypepermanent", "oppofindfirsttypecreature", "oppofindfirsttypenonpermanent", 
     "findfirsttypenonpermanent", "findfirsttypeelemental", "findfirsttypeelf", "findfirsttypeland", "oppofindfirsttypeland", "opponentpoolsave",
     "findfirsttypeplaneswalker", "findfirsttypeenchantment", "hasmansymw", "hasmansymr", "hasmansymg", "hasmansymu", "hasmansymb", "mypoolsave", 
     "prexx", "opponentdamagecount", "thatmuchcountersoneone", "plifelost", "poisoncount", "oppofindfirsttypenonland", "lowest", "usedmanab", 
     "usedmanag", "usedmanaw", "usedmanau", "usedmanar", "usedmanatot", "toxicity", "hastoxic", "ninelands", "mytgtforced", "numofactivation", 
-    "pringtemptations", "oringtemptations", "myhasdead", "oppohasdead"
+    "pringtemptations", "oringtemptations", "myhasdead"
     // Add any additional Wagic constant here
 };
 
@@ -316,7 +316,7 @@ std::vector<std::string> types = {
     "kmoonfolk", "krat", "ksnake", "a", "spell", "aether", "burst", "kjeldoran", "war", "cry", "one", "kind", "saclands", "less", "creatures", "rg",
     "artifacts", "enchantments", "lands", "t", "r", "b", "u", "d", "s", "w", "g", "l", "x", "e", "c", "p", "gw", "rw", "wu", "gu", "bg", "wb", 
     "h", "i", "ub", "q", "ur", "xx", "n", "color", "kindle", "scion", "skyshipped", "splinter", "stangg", "twin", "sunweb", "visitation", "vecna", 
-    "mirror", "mad", "phantasm", "cost", "word", "autostack", "anycnt", "anytarget"
+    "mirror", "mad", "phantasm", "cost", "word", "autostack", "anycnt", "anytarget", "propagation", "proliferation"
     // Add any additional Wagic types here
 };
 
@@ -422,6 +422,9 @@ static void SetStyles() {
 
     // Set the style for mismatched brackets
     ::SendMessage(nppData._scintillaMainHandle, SCI_STYLESETFORE, SCE_C_ESCAPESEQUENCE, RGB(255, 0, 0)); // Red style for errors
+
+    // Init the logger
+    initLogger();
 }
 
 static LRESULT HandleScnModified(SCNotification* notification) {
@@ -522,6 +525,7 @@ static void DisablePlugin() {
     int endpos = editor.GetLength();
     ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, 0, 0x1f);
     ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endpos, SCE_C_OPERATOR);
+    // Stop the logger
     stopLogger();
 }
 
@@ -1906,7 +1910,6 @@ static void SetCurrentEditor() {
     int which = -1;
     SendMessage(nppData._nppHandle, NPPM_GETCURRENTSCINTILLA, SCI_UNUSED, (LPARAM)&which);
     editor = (which == 0) ? editor1 : editor2;
-
     // Initialize the full vector starting from the single ones.
     if (allVectors.empty()) {
         allVectors.insert(allVectors.end(), zones.begin(), zones.end());
@@ -1917,6 +1920,13 @@ static void SetCurrentEditor() {
         allVectors.insert(allVectors.end(), triggers.begin(), triggers.end());
         allVectors.insert(allVectors.end(), macros.begin(), macros.end());
     }
+    // Check the current text to understand if it's a Wagic primitive file.
+    currentText = editor.GetText();
+    if ((currentText.find("[card]") != std::string::npos) || (currentText.find("[/card]") != std::string::npos) ||
+        (currentText.find("grade=") != std::string::npos))
+        SetStyles();
+    else
+        DisablePlugin();
 }
 
 LRESULT CALLBACK PluginWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -1956,7 +1966,6 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification * notifyCode) {
             DisablePlugin();
         break;
     }
-
 }
 
 // Plugin initialization

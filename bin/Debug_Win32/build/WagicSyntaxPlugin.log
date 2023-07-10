@@ -3,14 +3,14 @@
   Main.cpp
 C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(396,49): warning C4018: '>': errata corrispondenza tra signed e unsigned
 C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(396,79): warning C4018: '<': errata corrispondenza tra signed e unsigned
-C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(686,91): warning C4018: '<': errata corrispondenza tra signed e unsigned
-C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(691,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
-C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(696,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
-C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(701,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
-C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(706,98): warning C4018: '<': errata corrispondenza tra signed e unsigned
-C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(711,90): warning C4018: '<': errata corrispondenza tra signed e unsigned
-C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(716,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
-C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(721,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(690,91): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(695,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(700,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(705,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(710,98): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(715,90): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(720,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
+C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\src\Main.cpp(725,89): warning C4018: '<': errata corrispondenza tra signed e unsigned
   Generazione del codice in corso...
      Creazione della libreria C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\bin\Debug_Win32\WagicSyntaxPlugin.lib e dell'oggetto C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\bin\Debug_Win32\WagicSyntaxPlugin.exp
   WagicSyntaxPlugin.vcxproj -> C:\Program Files (x86)\Emulatori\Sony\PSVita\Games\PSP\Wagic\NppWagicSyntaxPlugin\bin\Debug_Win32\WagicSyntaxPlugin.dll

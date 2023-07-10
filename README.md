@@ -2,7 +2,9 @@
 The Wagic Primitives Syntax Plugin for Notepad++
 
 ## Usage
-The Plugin starts disabled by default, but you you can enable it by using the plugin menu choice "Enable and Perform Visible Lines Syntax Check (ALT+SPACEBAR)"
+The Plugin will automatically detect if to start enabled or disabled according to the current opened file.
+
+When the Plugin is disabled, you can enable it by using the plugin menu choice "Enable and Perform Visible Lines Syntax Check (ALT+SPACEBAR)"
 
 When the Plugin is enabled, you can disable it by using the plugin menu choice "Disable Inline Syntax Check (SHIFT+SPACEBAR)"
 
