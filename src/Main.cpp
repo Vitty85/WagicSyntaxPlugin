@@ -142,8 +142,12 @@ std::vector<std::string> zones = {
     "opponentgraveyard", "opponentbattlefield", "opponenthand", "opponentlibrary", "opponentstack", "opponentexile","ownersideboard", "ownerreveal",
     "ownercommandzone",  "ownergraveyard", "ownerbattlefield", "ownerinplay", "ownerhand", "ownerlibrary", "ownerstack", "ownerexile", "sideboard", 
     "commandzone", "reveal", "graveyard", "battlefield", "inplay", "hand", "library", "nonbattlezone", "stack", "exile", "previousbattlefield", 
-    "targetedpersonsstack", "targetcontrollerbattlefield", "targetedpersonslibrary", "targetedplayerbattlefield", "targetcontrollergraveyard", 
-    "targetedpersonsgraveyard", "targetedpersonshand", "targetcontrollerlibrary"
+    "targetedpersonssideboard", "targetedpersonsreveal", "targetedpersonscommandzone", "targetedpersonsgraveyard", "targetedpersonsbattlefield",
+    "targetedpersonsinplay", "targetedpersonshand", "targetedpersonslibrary", "targetedpersonsstack", "targetedpersonsexile", "targetcontrollerexile",
+    "targetcontrollersideboard", "targetcontrollerreveal", "targetcontrollercommandzone", "targetcontrollergraveyard", "targetcontrollerbattlefield",
+    "targetcontrollerinplay", "targetcontrollerhand", "targetcontrollerlibrary", "targetcontrollerstack", "targetedplayersideboard", 
+    "targetedplayerhand", "targetedplayercommandzone", "targetedplayergraveyard", "targetedplayerbattlefield", "targetedplayerinplay", 
+    "targetedplayerlibrary", "targetedplayerexile", "targetedplayerstack", "targetedplayerreveal"
     // Add any additional Wagic zone here
 };
 
@@ -165,7 +169,11 @@ std::vector<std::string> triggers = {
     "@each opponent end", "@each opponent cleanup", "@each opponent untap", "@next endofturn", "@next beginofturn", "@next upkeep", "@each my draw",
     "@next firstmain", "@next combatbegins", "@next attackers", "@next blockers", "@next combatdamage", "@next combatends", "@next secondmain", 
     "@each opponent draw", "@next end", "@next cleanup", "@next untap", "@proliferateof", "@proliferatefoeof", "@ninjutsued", "@ringtemptedof", 
-    "@ringtemptedfoeof", "@becomesmonarchfoeof", "@bearerchosen", "@bearernewchosen"
+    "@ringtemptedfoeof", "@becomesmonarchfoeof", "@bearerchosen", "@bearernewchosen", "@each targetedplayer endofturn", "@each targetedplayer end",
+    "@each targetedplayer beginofturn", "@each targetedplayer upkeep", "@each targetedplayer firstmain", "@each targetedplayer combatbegins", 
+    "@each targetedplayer attackers", "@each targetedplayer blockers", "@each targetedplayer combatdamage", "@each targetedplayer combatends", 
+    "@each targetedplayer secondmain", "@each targetedplayer cleanup", "@each targetedplayer untap"
+
     // Add any additional Wagic trigger here
 };
 
@@ -231,7 +239,7 @@ std::vector<std::string> constants = {
     "findfirsttypeplaneswalker", "findfirsttypeenchantment", "hasmansymw", "hasmansymr", "hasmansymg", "hasmansymu", "hasmansymb", "mypoolsave", 
     "prexx", "opponentdamagecount", "thatmuchcountersoneone", "plifelost", "poisoncount", "oppofindfirsttypenonland", "lowest", "usedmanab", 
     "usedmanag", "usedmanaw", "usedmanau", "usedmanar", "usedmanatot", "toxicity", "hastoxic", "ninelands", "mytgtforced", "numofactivation", 
-    "pringtemptations", "oringtemptations", "myhasdead"
+    "pringtemptations", "oringtemptations", "myhasdead", "oppotgt", "ctrltgt", "ohandsize"
     // Add any additional Wagic constant here
 };
 
