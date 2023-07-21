@@ -239,7 +239,7 @@ std::vector<std::string> constants = {
     "findfirsttypeplaneswalker", "findfirsttypeenchantment", "hasmansymw", "hasmansymr", "hasmansymg", "hasmansymu", "hasmansymb", "mypoolsave", 
     "prexx", "opponentdamagecount", "thatmuchcountersoneone", "plifelost", "poisoncount", "oppofindfirsttypenonland", "lowest", "usedmanab", 
     "usedmanag", "usedmanaw", "usedmanau", "usedmanar", "usedmanatot", "toxicity", "hastoxic", "ninelands", "mytgtforced", "numofactivation", 
-    "pringtemptations", "oringtemptations", "myhasdead", "oppotgt", "ctrltgt", "ohandsize"
+    "pringtemptations", "oringtemptations", "myhasdead", "oppotgt", "ctrltgt", "ohandsize", "isattacker", "couldattack"
     // Add any additional Wagic constant here
 };
 
@@ -1931,7 +1931,7 @@ static void SetCurrentEditor() {
     // Check the current text to understand if it's a Wagic primitive file.
     currentText = editor.GetText();
     if ((currentText.find("[card]") != std::string::npos) || (currentText.find("[/card]") != std::string::npos) ||
-        (currentText.find("grade=") != std::string::npos))
+        (currentText.find("grade=") != std::string::npos) || (currentText.find("#AUTO_DEFINE") != std::string::npos))
         SetStyles();
     else
         DisablePlugin();
