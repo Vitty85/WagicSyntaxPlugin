@@ -129,7 +129,7 @@ std::vector<std::string> keywords = {
     "powercountersoneone", "powerlifeloss", "manacoststrike", "chargelifegain", "myupkeep", "untaponly", "toughnesstrike", "chargedeplete", 
     "chargestrike", "manacostpumppow", "didcombatdamagetofoe", "manacostpumpboth", "manacostpumptough", "powerdraw", "colorspumpboth", "postbattle", 
     "nonwall", "value", "twist", "emblem", "combatdamage", "convoke", "crew", "improvise", "delve", "emerge", "readytofight", "theringtempts",
-    "oppoattacked", "untp"
+    "oppoattacked", "untp", "nocost", "removeallsubtypes", "removeallcolors"
     // Add any additional Wagic keyword here
 };
 
