@@ -435,6 +435,99 @@ static void SetStyles() {
     initLogger();
 }
 
+static void ShowAbout() {
+	ShowAboutDialog((HINSTANCE)dllModule, MAKEINTRESOURCE(IDD_ABOUTDLG), nppData._nppHandle);
+}
+
+static void DisablePlugin() {
+    active = false;
+    int endpos = editor.GetLength();
+    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, 0, 0x1f);
+    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endpos, SCE_C_OPERATOR);
+    // Stop the logger
+    stopLogger();
+}
+
+static void CheckWagicAllLinesSyntax() {
+    SetStyles();
+    currentLineCount = editor.GetLineCount();
+    for (int i = 0; i < currentLineCount; i++)
+        CheckWagicLineSyntax(i);
+}
+
+static void CheckWagicVisibleLinesSyntax(SCNotification* notification)
+{
+    SetStyles();
+    int lineCount = editor.GetLineCount();
+    int firstLine = editor.GetFirstVisibleLine();
+    int visibleLineCount = editor.LinesOnScreen();
+    int selStart = editor.GetSelectionStart();
+    int selEnd = editor.GetSelectionEnd();
+    std::string newText = editor.GetText();
+    bool force = (notification->nmhdr.code == NPPN_BUFFERACTIVATED) || (notification->nmhdr.code == NPPN_FILEOPENED) ||
+        (notification->nmhdr.code == NPPN_READY) || (notification->nmhdr.code == SCN_ZOOM) || (notification->nmhdr.code == SCN_FOCUSIN) ||
+        ((notification->nmhdr.code == SCN_UPDATEUI && notification->updated == 1) && (newText == currentText)) ||
+        ((notification->nmhdr.code == SCN_UPDATEUI && notification->updated == 1) && (newText != currentText) && (lineCount == currentLineCount)) ||
+        ((notification->nmhdr.code == SCN_UPDATEUI && notification->updated == 1) && (lineCount != currentLineCount));
+    if (force || (currentText != newText) || (currentFirstLine != firstLine) || 
+        (currentVisibleLineCount != visibleLineCount) || (currentLineCount != lineCount)) {
+        int startcheck = 0;
+        int endcheck = 0;
+        if (!force && (firstLine > currentFirstLine)) {
+            startcheck = currentFirstLine + visibleLineCount;
+            endcheck = startcheck + (firstLine - currentFirstLine);
+        }
+        if (!force && (firstLine < currentFirstLine)) {
+            startcheck = firstLine;
+            endcheck = firstLine + (currentFirstLine - firstLine);
+        }
+        if (!force && (lineCount > currentLineCount)) {
+            int currentPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETCURRENTPOS, 0, 0);
+            int currentLine = ::SendMessage(nppData._scintillaMainHandle, SCI_LINEFROMPOSITION, currentPosition, 0);
+            startcheck = currentLine - (lineCount - currentLineCount);
+            endcheck = currentLine + (lineCount - currentLineCount);
+        }
+        if (!force && (lineCount < currentLineCount)) {
+            if (lineCount > visibleLineCount) {
+                int currentPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETCURRENTPOS, 0, 0);
+                int currentLine = ::SendMessage(nppData._scintillaMainHandle, SCI_LINEFROMPOSITION, currentPosition, 0);
+                startcheck = currentLine - (currentLineCount - lineCount);
+                endcheck = currentLine + visibleLineCount - (currentLine - firstLine);
+            }
+            else {
+                startcheck = firstLine + lineCount - (currentLineCount - lineCount);
+                endcheck = firstLine + lineCount + (currentLineCount - lineCount);
+            }
+        }
+        if (force || (endcheck - startcheck) > visibleLineCount) {
+            startcheck = firstLine;
+            endcheck = (lineCount > visibleLineCount) ? (firstLine + visibleLineCount) : (firstLine + lineCount);
+        }
+        CheckWagicLineSyntax(-1);
+        if(startcheck < endcheck) {
+            if (startcheck < 0)
+                startcheck = 0;
+            if (endcheck < lineCount)
+                endcheck++;
+            if (endcheck > lineCount)
+                endcheck = lineCount;
+            for (int i = startcheck; i < endcheck; i++)
+                CheckWagicLineSyntax(i);
+        }
+    }
+    currentFirstLine = firstLine;
+    currentVisibleLineCount = visibleLineCount;
+    currentLineCount = lineCount;
+    currentText = newText;
+}
+
+static void CheckWagicVisibleLinesSyntax()
+{
+    SCNotification* notification = new SCNotification();
+    notification->nmhdr.code = NPPN_BUFFERACTIVATED;
+    CheckWagicVisibleLinesSyntax(notification);
+}
+
 static LRESULT HandleScnModified(SCNotification* notification) {
     int checked = 0;
     // Get the info about the current line and position
@@ -449,7 +542,7 @@ static LRESULT HandleScnModified(SCNotification* notification) {
             checked = -1;
         // Check if the current row needs to receive suggestions or not
         std::string lineText = editor.GetLine(currentLine);
-        if (!(lineText.find("text=") != 0 && lineText.find("partner=") != 0 && lineText.find("backside=") != 0 && 
+        if (!(lineText.find("text=") != 0 && lineText.find("partner=") != 0 && lineText.find("backside=") != 0 &&
             lineText.find("name=") != 0 && lineText.find("power=") != 0 && lineText.find("toughness=") != 0 &&
             lineText.find("type=") != 0 && lineText.find("subtype=") != 0 && lineText.find("grade=") != 0))
             checked = -1;
@@ -524,100 +617,6 @@ static LRESULT HandleScnModified(SCNotification* notification) {
     return checked;
 }
 
-static void ShowAbout() {
-	ShowAboutDialog((HINSTANCE)dllModule, MAKEINTRESOURCE(IDD_ABOUTDLG), nppData._nppHandle);
-}
-
-static void DisablePlugin() {
-    active = false;
-    int endpos = editor.GetLength();
-    ::SendMessage(nppData._scintillaMainHandle, SCI_STARTSTYLING, 0, 0x1f);
-    ::SendMessage(nppData._scintillaMainHandle, SCI_SETSTYLING, endpos, SCE_C_OPERATOR);
-    // Stop the logger
-    stopLogger();
-}
-
-static void CheckWagicAllLinesSyntax() {
-    SetStyles();
-    currentLineCount = editor.GetLineCount();
-    for (int i = 0; i < currentLineCount; i++)
-        CheckWagicLineSyntax(i);
-}
-
-static void CheckWagicVisibleLinesSyntax(SCNotification* notification)
-{
-    SetStyles();
-    int lineCount = editor.GetLineCount();
-    int firstLine = editor.GetFirstVisibleLine();
-    int visibleLineCount = editor.LinesOnScreen();
-    int selStart = editor.GetSelectionStart();
-    int selEnd = editor.GetSelectionEnd();
-    std::string newText = editor.GetText();
-    bool force = (notification->nmhdr.code == NPPN_BUFFERACTIVATED) || (notification->nmhdr.code == NPPN_FILEOPENED) ||
-        (notification->nmhdr.code == NPPN_READY) || (notification->nmhdr.code == SCN_ZOOM) || (notification->nmhdr.code == SCN_FOCUSIN) ||
-        ((notification->nmhdr.code == SCN_UPDATEUI && notification->updated == 1) && (newText == currentText)) ||
-        ((notification->nmhdr.code == SCN_UPDATEUI && notification->updated == 1) && (lineCount > currentLineCount));
-    if (force || (currentText != newText) || (currentFirstLine != firstLine) || 
-        (currentVisibleLineCount != visibleLineCount) || (currentLineCount != lineCount)) {
-        int startcheck = 0;
-        int endcheck = 0;
-        if (!force && (firstLine > currentFirstLine)) {
-            startcheck = currentFirstLine + visibleLineCount;
-            endcheck = startcheck + (firstLine - currentFirstLine);
-        }
-        if (!force && (firstLine < currentFirstLine)) {
-            startcheck = firstLine;
-            endcheck = firstLine + (currentFirstLine - firstLine);
-        }
-        if (!force && (lineCount > currentLineCount)) {
-            int currentPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETCURRENTPOS, 0, 0);
-            int currentLine = ::SendMessage(nppData._scintillaMainHandle, SCI_LINEFROMPOSITION, currentPosition, 0);
-            startcheck = currentLine - (lineCount - currentLineCount);
-            endcheck = currentLine + (lineCount - currentLineCount);
-        }
-        if (!force && (lineCount < currentLineCount)) {
-            if (lineCount > visibleLineCount) {
-                int currentPosition = ::SendMessage(nppData._scintillaMainHandle, SCI_GETCURRENTPOS, 0, 0);
-                int currentLine = ::SendMessage(nppData._scintillaMainHandle, SCI_LINEFROMPOSITION, currentPosition, 0);
-                startcheck = currentLine - (currentLineCount - lineCount);
-                endcheck = currentLine + visibleLineCount - (currentLine - firstLine);
-            }
-            else {
-                startcheck = firstLine + lineCount - (currentLineCount - lineCount);
-                endcheck = firstLine + lineCount + (currentLineCount - lineCount);
-            }
-        }
-        if (force || (endcheck - startcheck) > visibleLineCount) {
-            startcheck = firstLine;
-            endcheck = (lineCount > visibleLineCount) ? (firstLine + visibleLineCount) : (firstLine + lineCount);
-        }
-        if (startcheck >= endcheck) {
-            CheckWagicLineSyntax(-1);
-        }
-        else {
-            if (startcheck < 0)
-                startcheck = 0;
-            if (endcheck < lineCount)
-                endcheck++;
-            if (endcheck > lineCount)
-                endcheck = lineCount;
-            for (int i = startcheck; i < endcheck; i++)
-                CheckWagicLineSyntax(i);
-        }
-    }
-    currentFirstLine = firstLine;
-    currentVisibleLineCount = visibleLineCount;
-    currentLineCount = lineCount;
-    currentText = newText;
-}
-
-static void CheckWagicVisibleLinesSyntax()
-{
-    SCNotification* notification = new SCNotification();
-    notification->nmhdr.code = NPPN_BUFFERACTIVATED;
-    CheckWagicVisibleLinesSyntax(notification);
-}
-
 static void CheckWagicLineSyntax(int i) {
     if (i < 0)
         i = editor.LineFromPosition(editor.GetCurrentPos());
@@ -645,6 +644,9 @@ static void CheckWagicLineSyntax(int i) {
             offset = offset = lineText.find("=");
             if (offset < 0)
                 return;
+        }
+        else {
+            offset += 12;
         }
         lineText = lineText.substr(offset);
         size_t pos = 0;
