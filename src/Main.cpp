@@ -154,7 +154,7 @@ std::vector<std::string> zones = {
 // List of Wagic triggers
 std::vector<std::string> triggers = {
     "@tappedformana", "@becomesmonarchof", "@drawof", "@combat", "@boasted", "@targeted", "@lifelostfoeof", "@noncombatdamagefoeof", 
-    "@takeninitiativeof", "@takeninitiativefoeof", "@energizedof", "@counteradded", "@totalcounteradded", "@scryed", "@producedmana",
+    "@takeninitiativeof", "@takeninitiativefoeof", "@energizedof", "@counteradded", "@totalcounteradded", "@totalcounterremoved"
     "@dierolled", "@damageof", "@sacrificed", "@combatdamaged", "@shuffledfoeof", "@cycled", "@poisonedfoeof", "@foretold", "@energizedfoeof", 
     "@discarded", "@tokencreated", "@phasedin", "@untapped", "@drawfoeof", "@combatdamagefoeof", "@exploited", "@poisonedof", "@exerted", 
     "@movedTo", "@experiencedof", "@counterremoved", "@vampired", "@countermod", "@experiencedfoeof", "@shuffledof", "@lifeof", "@noncombatdamaged", 
@@ -172,8 +172,7 @@ std::vector<std::string> triggers = {
     "@ringtemptedfoeof", "@becomesmonarchfoeof", "@bearerchosen", "@bearernewchosen", "@each targetedplayer endofturn", "@each targetedplayer end",
     "@each targetedplayer beginofturn", "@each targetedplayer upkeep", "@each targetedplayer firstmain", "@each targetedplayer combatbegins", 
     "@each targetedplayer attackers", "@each targetedplayer blockers", "@each targetedplayer combatdamage", "@each targetedplayer combatends", 
-    "@each targetedplayer secondmain", "@each targetedplayer cleanup", "@each targetedplayer untap"
-
+    "@each targetedplayer secondmain", "@each targetedplayer cleanup", "@each targetedplayer untap", "@scryed", "@producedmana"
     // Add any additional Wagic trigger here
 };
 
